@@ -3,13 +3,14 @@ import pandas as pd
 from keras import layers
 import keras
 import matplotlib.pyplot as plt
+import scipy as sp
 
 
 def fun(x_vals):
-    return np.cos(np.pi + 5 * x_vals) + np.sin(2 * x_vals + 2)
+    return np.heaviside(x, 0.5) * np.cos(np.pi + 5 * x_vals) + np.sin(2 * x_vals + 2)
 
 
-x = np.linspace(0, 2 * np.pi, 10000)
+x = np.linspace(-2, 2, 10000)
 y = fun(x)
 
 dataset = pd.DataFrame({"x": x, "y": y})
@@ -35,7 +36,7 @@ model = keras.Sequential(
     [
         feature_normalizer,
         layers.Dense(64, activation='relu'),
-        layers.Dense(128, activation='relu'),
+        layers.Dense(64, activation='relu'),
         layers.Dense(64, activation='relu'),
         layers.Dense(1)
     ]
@@ -43,23 +44,28 @@ model = keras.Sequential(
 
 model.compile(
     optimizer=keras.optimizers.Adam(0.001),
-    loss=keras.losses.MeanSquaredError,
+    loss=keras.losses.mean_squared_error,
 )
 
-print(np.shape(train_features["x"]))
-
-history = model.fit(
+model.fit(
     train_features["x"],
     train_labels,
     batch_size=64,
     epochs=20,
-    validation_split=0.2,
+    validation_split=0.1,
 )
 
 x_plot = test_features["x"]
 y = model.predict(x_plot)
 
-plt.plot(x_plot, y, label='Predictions')
-plt.plot(x_plot, test_labels, label='True values')
+interpolate_dataset = train_dataset.copy()
+interpolate_dataset.sort_values(by="x", inplace=True)
+y_interp = sp.interpolate.CubicSpline(interpolate_dataset["x"].to_numpy(), interpolate_dataset.pop("y").to_numpy())
+
+plt.plot(x_plot, y, label='Predictions - MSE')
+plt.plot(x_plot, y_interp(x_plot), label='Interpolation')
+# plt.plot(x_plot, y_interp(x_plot, 1), label='Interpolation - first derivative')
+plt.plot(x_plot, test_labels, 'g:', label='Actual Data')
+
 plt.legend()
 plt.show()
