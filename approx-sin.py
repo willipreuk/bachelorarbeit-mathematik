@@ -7,6 +7,9 @@ import scipy as sp
 
 
 def fun(x_vals):
+    # runge's function
+    # return 1/(1 + 25 * x_vals**2)
+
     return np.heaviside(x, 0.5) * np.cos(np.pi + 5 * x_vals) + np.sin(2 * x_vals + 2)
 
 
@@ -64,7 +67,7 @@ y_interp = sp.interpolate.CubicSpline(interpolate_dataset["x"].to_numpy(), inter
 
 plt.plot(x_plot, y, label='Predictions - MSE')
 plt.plot(x_plot, y_interp(x_plot), label='Interpolation')
-# plt.plot(x_plot, y_interp(x_plot, 1), label='Interpolation - first derivative')
+# plt.plot(x_plot, y_interp(x_plot, 2), label='Interpolation - second derivative')
 plt.plot(x_plot, test_labels, 'g:', label='Actual Data')
 
 plt.legend()
