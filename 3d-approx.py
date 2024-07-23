@@ -23,8 +23,8 @@ def weg(t):
     return calculate_z(x, y) * gamma_dot(t)
 
 
-x_data = np.linspace(0, np.pi, 100)
-y_data = np.linspace(0, np.pi, 100)
+x_data = np.linspace(0, np.pi, 500)
+y_data = np.linspace(0, np.pi, 500)
 x_data_mesh, y_data_mesh = np.meshgrid(x_data, y_data)
 x_data_mesh_flat = x_data_mesh.flatten()
 y_data_mesh_flat = y_data_mesh.flatten()
@@ -67,9 +67,20 @@ history = model.fit(
     train_features,
     train_labels,
     batch_size=128,
-    epochs=200,
+    epochs=1000,
     validation_data=(test_features, test_labels)
 )
+
+# Second figure: Model loss over epochs
+fig2 = plt.figure()
+ax2 = fig2.add_subplot(111)
+ax2.plot(history.history['loss'], label='train')
+ax2.plot(history.history['val_loss'], label='test')
+ax2.set_title('Model Loss')
+ax2.set_xlabel('Epoch')
+ax2.set_ylabel('Loss')
+ax2.legend(loc='upper left')
+plt.show()  # Display the second figure
 
 
 def weg_integral():
@@ -79,9 +90,13 @@ def weg_integral():
     t = np.linspace(t_start, t_end, 100)
     x, y = gamma(t)
     predict_dataset = pd.DataFrame({"x": x, "y": y})
-    z = model.predict(predict_dataset)
-    integral_pred = sp.integrate.trapezoid(z.flatten() * gamma_dot(t), t)
+    z_model = model.predict(predict_dataset)
+    integral_pred = sp.integrate.trapezoid(z_model.flatten() * gamma_dot(t), t)
     print("Predicted integral: ", integral_pred)
+    z_calc = calculate_z(x, y)
+    integral_calc = sp.integrate.trapezoid(z_calc * gamma_dot(t), t)
+    print("Calculated integral: ", integral_calc)
+
     integral_correct = sp.integrate.quad(weg, t_start, t_end)
     print("Correct integral: ", integral_correct[0])
 
@@ -105,16 +120,7 @@ def print_model():
     ax1.plot_surface(X, Y, Z_pred, rstride=1, cstride=1, cmap='inferno', edgecolor='none')
     ax1.plot_surface(X, Y, Z, rstride=1, cstride=1, cmap='viridis', edgecolor='none') # Display the first figure
 
-    # Second figure: Model loss over epochs
-    fig2 = plt.figure()
-    ax2 = fig2.add_subplot(111)
-    ax2.plot(history.history['loss'], label='train')
-    ax2.plot(history.history['val_loss'], label='test')
-    ax2.set_title('Model Loss')
-    ax2.set_xlabel('Epoch')
-    ax2.set_ylabel('Loss')
-    ax2.legend(loc='upper left')
-    plt.show()  # Display the second figure
+    plt.show()
 
 
 weg_integral()
