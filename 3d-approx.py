@@ -63,7 +63,7 @@ model.compile(
     loss=keras.losses.mean_absolute_error,
 )
 
-model.fit(
+history = model.fit(
     train_features,
     train_labels,
     batch_size=128,
@@ -87,9 +87,6 @@ def weg_integral():
 
 
 def print_model():
-    fig = plt.figure()
-    ax = plt.axes(projection='3d')
-
     x = np.linspace(0, np.pi, 100)
     y = np.linspace(0, np.pi, 100)
     X, Y = np.meshgrid(x, y)
@@ -99,17 +96,25 @@ def print_model():
     predict_dataset = pd.DataFrame({"x": x_flat, "y": y_flat})
     z_pred = model.predict(predict_dataset)
     Z_pred = z_pred.reshape(X.shape)
-    ax.plot_surface(X, Y, Z_pred, rstride=1, cstride=1, cmap='inferno', edgecolor='none')
 
     Z = calculate_z(X, Y)
-    ax.plot_surface(X, Y, Z, rstride=1, cstride=1, cmap='viridis', edgecolor='none')
 
-    a = np.linspace(0, np.pi, 100)
-    Z_line = calculate_z(a, a)
-    #ax.plot3D(a, a, Z_line, 'red')
+    # First figure: 3D surface plot
+    fig1 = plt.figure()
+    ax1 = fig1.add_subplot(111, projection='3d')
+    ax1.plot_surface(X, Y, Z_pred, rstride=1, cstride=1, cmap='inferno', edgecolor='none')
+    ax1.plot_surface(X, Y, Z, rstride=1, cstride=1, cmap='viridis', edgecolor='none') # Display the first figure
 
-    fig.show()
-    plt.show()
+    # Second figure: Model loss over epochs
+    fig2 = plt.figure()
+    ax2 = fig2.add_subplot(111)
+    ax2.plot(history.history['loss'], label='train')
+    ax2.plot(history.history['val_loss'], label='test')
+    ax2.set_title('Model Loss')
+    ax2.set_xlabel('Epoch')
+    ax2.set_ylabel('Loss')
+    ax2.legend(loc='upper left')
+    plt.show()  # Display the second figure
 
 
 weg_integral()
