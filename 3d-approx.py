@@ -1,16 +1,30 @@
 import numpy as np
+import scipy as sp
 import matplotlib.pyplot as plt
 import pandas as pd
 from keras import layers
 import keras
 
 
+def gamma(t):
+    return [t, t ** 2]
+
+
+def gamma_dot(t):
+    return np.sqrt(1 + 2 * t ** 2)
+
+
 def calculate_z(x, y):
     return np.e ** x * np.cos(y) * np.sin(x + np.pi)
 
 
-x_data = np.linspace(0, np.pi, 1000)
-y_data = np.linspace(0, np.pi, 1000)
+def weg(t):
+    x, y = gamma(t)
+    return calculate_z(x, y) * gamma_dot(t)
+
+
+x_data = np.linspace(0, np.pi, 100)
+y_data = np.linspace(0, np.pi, 100)
 x_data_mesh, y_data_mesh = np.meshgrid(x_data, y_data)
 x_data_mesh_flat = x_data_mesh.flatten()
 y_data_mesh_flat = y_data_mesh.flatten()
@@ -34,15 +48,13 @@ print("Shape of testing datapoints: ", np.shape(test_dataset))
 feature_normalizer = layers.Normalization(axis=-1)
 feature_normalizer.adapt(np.array(train_features))
 
-print(feature_normalizer.mean.numpy())
-
 model = keras.Sequential(
     [
         feature_normalizer,
         layers.Dense(128, activation='relu'),
         layers.Dense(128, activation='relu'),
         layers.Dense(128, activation='relu'),
-        layers.Dense(1)
+        layers.Dense(1, activation="linear")
     ]
 )
 
@@ -55,30 +67,49 @@ model.fit(
     train_features,
     train_labels,
     batch_size=128,
-    epochs=10,
+    epochs=200,
     validation_data=(test_features, test_labels)
 )
 
-fig = plt.figure()
-ax = plt.axes(projection='3d')
 
-x = np.linspace(0, np.pi, 100)
-y = np.linspace(0, np.pi, 100)
-X, Y = np.meshgrid(x, y)
+def weg_integral():
+    t_start = 0
+    t_end = 1
 
-x_flat = X.flatten()
-y_flat = Y.flatten()
-predict_dataset = pd.DataFrame({"x": x_flat, "y": y_flat})
-z_pred = model.predict(predict_dataset)
-Z_pred = z_pred.reshape(X.shape)
-ax.plot_surface(X, Y, Z_pred, rstride=1, cstride=1, cmap='inferno', edgecolor='none')
+    t = np.linspace(t_start, t_end, 100)
+    x, y = gamma(t)
+    predict_dataset = pd.DataFrame({"x": x, "y": y})
+    z = model.predict(predict_dataset)
+    integral_pred = sp.integrate.trapezoid(z.flatten() * gamma_dot(t), t)
+    print("Predicted integral: ", integral_pred)
+    integral_correct = sp.integrate.quad(weg, t_start, t_end)
+    print("Correct integral: ", integral_correct[0])
 
-Z = calculate_z(X, Y)
-ax.plot_surface(X, Y, Z, rstride=1, cstride=1, cmap='viridis', edgecolor='none')
 
-a = np.linspace(0, np.pi, 100)
-Z_line = calculate_z(a, a)
-#ax.plot3D(a, a, Z_line, 'red')
+def print_model():
+    fig = plt.figure()
+    ax = plt.axes(projection='3d')
 
-fig.show()
-plt.show()
+    x = np.linspace(0, np.pi, 100)
+    y = np.linspace(0, np.pi, 100)
+    X, Y = np.meshgrid(x, y)
+
+    x_flat = X.flatten()
+    y_flat = Y.flatten()
+    predict_dataset = pd.DataFrame({"x": x_flat, "y": y_flat})
+    z_pred = model.predict(predict_dataset)
+    Z_pred = z_pred.reshape(X.shape)
+    ax.plot_surface(X, Y, Z_pred, rstride=1, cstride=1, cmap='inferno', edgecolor='none')
+
+    Z = calculate_z(X, Y)
+    ax.plot_surface(X, Y, Z, rstride=1, cstride=1, cmap='viridis', edgecolor='none')
+
+    a = np.linspace(0, np.pi, 100)
+    Z_line = calculate_z(a, a)
+    #ax.plot3D(a, a, Z_line, 'red')
+
+    fig.show()
+    plt.show()
+
+
+weg_integral()
