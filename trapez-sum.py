@@ -62,12 +62,12 @@ def gauss_legendre_integration(f, a, b):
 
 def gauss_legendre_integration_multiple_intervals(f, a, b, num_intervals):
     # Calculate the width of each subinterval
-    sub_interval_width = (b - a) / num_intervals
+    h = (b - a) / num_intervals
     total_integral = 0.0
 
     for i in range(num_intervals):
-        sub_a = a + i * sub_interval_width
-        sub_b = sub_a + sub_interval_width
+        sub_a = a + i * h
+        sub_b = sub_a + h
         total_integral += gauss_legendre_integration(f, sub_a, sub_b)
 
     return total_integral

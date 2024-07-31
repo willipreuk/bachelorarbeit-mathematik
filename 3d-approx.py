@@ -3,6 +3,7 @@ import scipy as sp
 import matplotlib.pyplot as plt
 import pandas as pd
 from keras import layers
+from keras import callbacks
 import keras
 
 
@@ -23,8 +24,8 @@ def weg(t):
     return calculate_z(x, y) * gamma_dot(t)
 
 
-x_data = np.linspace(0, np.pi, 500)
-y_data = np.linspace(0, np.pi, 500)
+x_data = np.linspace(0, np.pi, 250)
+y_data = np.linspace(0, np.pi, 250)
 x_data_mesh, y_data_mesh = np.meshgrid(x_data, y_data)
 x_data_mesh_flat = x_data_mesh.flatten()
 y_data_mesh_flat = y_data_mesh.flatten()
@@ -63,15 +64,17 @@ model.compile(
     loss=keras.losses.mean_absolute_error,
 )
 
+early_stopping = callbacks.EarlyStopping(monitor='val_loss', patience=10, restore_best_weights=True)
+
 history = model.fit(
     train_features,
     train_labels,
     batch_size=128,
-    epochs=1000,
-    validation_data=(test_features, test_labels)
+    epochs=100,
+    validation_data=(test_features, test_labels),
+    callbacks=[early_stopping]
 )
 
-# Second figure: Model loss over epochs
 fig2 = plt.figure()
 ax2 = fig2.add_subplot(111)
 ax2.plot(history.history['loss'], label='train')
@@ -118,7 +121,7 @@ def print_model():
     fig1 = plt.figure()
     ax1 = fig1.add_subplot(111, projection='3d')
     ax1.plot_surface(X, Y, Z_pred, rstride=1, cstride=1, cmap='inferno', edgecolor='none')
-    ax1.plot_surface(X, Y, Z, rstride=1, cstride=1, cmap='viridis', edgecolor='none') # Display the first figure
+    ax1.plot_surface(X, Y, Z, rstride=1, cstride=1, cmap='viridis', edgecolor='none')  # Display the first figure
 
     plt.show()
 
