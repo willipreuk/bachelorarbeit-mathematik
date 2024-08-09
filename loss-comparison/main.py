@@ -7,8 +7,10 @@ from keras import callbacks
 from model import calculate_z, gamma, gamma_dot, weg
 import pandas as pd
 
-x_data = np.linspace(0, np.pi, 500)
-y_data = np.linspace(0, np.pi, 500)
+min = 0
+max = 1/2 * np.pi
+x_data = np.linspace(min, max, 500)
+y_data = np.linspace(min, max, 500)
 x_data_mesh, y_data_mesh = np.meshgrid(x_data, y_data)
 x_data_mesh_flat = x_data_mesh.flatten()
 y_data_mesh_flat = y_data_mesh.flatten()
@@ -36,9 +38,9 @@ def create_model():
 
     return keras.Sequential([
         feature_normalizer,
-        layers.Dense(128, activation='relu'),
-        layers.Dense(128, activation='relu'),
-        layers.Dense(128, activation='relu'),
+        layers.Dense(64, activation='tanh'),
+        layers.Dense(64, activation='tanh'),
+        layers.Dense(64, activation='tanh'),
         layers.Dense(1, activation="linear")
     ])
 
@@ -46,7 +48,8 @@ def create_model():
 loss_functions = {
     'MeanSquaredError': keras.losses.mean_squared_error,
     'MeanAbsoluteError': keras.losses.mean_absolute_error,
-    'Huber': keras.losses.huber
+    'Huber': keras.losses.huber,
+    "LogCosh": keras.losses.log_cosh,
 }
 
 results = {}
@@ -80,19 +83,26 @@ for name, loss_fn in loss_functions.items():
     z_calc = calculate_z(x, y)
     integral_calc = sp.integrate.trapezoid(z_calc * gamma_dot(t), t)
 
-    error = integral_calc - integral_pred
+    integral_ref = sp.integrate.quad(weg, t_start, t_end)
+
+    error = np.abs(integral_calc - integral_pred)
+    error_ref = np.abs(integral_ref[0] - integral_pred)
 
     # Store the results
     results[name] = {
         'loss': test_loss,
         'mae': test_mae,
         'history': history.history,
-        'error': error
+        'error': error,
+        'error_ref': error_ref,
+        'error_ref-calculated': np.abs(integral_ref[0] - integral_calc)
     }
 
-for name, result in results.items():
+for name, result in sorted(results.items(), key=lambda x: x[1]['error_ref']):
     print(f"Loss Function: {name}")
     print(f"Test Loss: {result['loss']}")
     print(f"Test MAE: {result['mae']}")
-    print(f"Integral Error: {result['error']}")
+    print(f"I_trapez - I_pred / Error: {result['error']}")
+    print(f"I_ref - I_pred / Error: {result['error_ref']}")
+    print(f"I_ref - I_trapez / Error: {result['error_ref-calculated']}")
     print("-" * 30)
