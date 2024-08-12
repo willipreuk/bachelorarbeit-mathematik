@@ -10,7 +10,8 @@ def gamma_dot(t):
 
 
 def calculate_z(x, y):
-    return np.e ** x * np.tanh(y) * 10 * np.sin(x + np.pi) + np.cosh(y*5)*10
+    return x * (1 - y) * np.cos(4 * np.pi * x) * np.sin(4 * np.pi * y ** 2) ** 2
+    # return np.e ** x * np.tanh(y) * np.sin(x + np.pi) + np.cosh(y * 5) * x * (1 - y)
 
 
 def weg(t):

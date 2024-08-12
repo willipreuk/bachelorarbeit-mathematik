@@ -6,6 +6,7 @@ from keras import layers
 from keras import callbacks
 from model import calculate_z, gamma, gamma_dot, weg
 import pandas as pd
+import csv
 
 min = 0
 max = 1/2 * np.pi
@@ -62,7 +63,7 @@ for name, loss_fn in loss_functions.items():
     # Compile the model with the current loss function
     model.compile(optimizer=Adam(), loss=loss_fn, metrics=['mae'])
 
-    early_stopping = callbacks.EarlyStopping(monitor='val_loss', patience=5, restore_best_weights=True)
+    early_stopping = callbacks.EarlyStopping(monitor='val_loss', patience=2, restore_best_weights=True)
 
     # Train the model
     history = model.fit(train_features, train_labels, epochs=100, batch_size=32,
@@ -98,11 +99,24 @@ for name, loss_fn in loss_functions.items():
         'error_ref-calculated': np.abs(integral_ref[0] - integral_calc)
     }
 
-for name, result in sorted(results.items(), key=lambda x: x[1]['error_ref']):
-    print(f"Loss Function: {name}")
-    print(f"Test Loss: {result['loss']}")
-    print(f"Test MAE: {result['mae']}")
-    print(f"I_trapez - I_pred / Error: {result['error']}")
-    print(f"I_ref - I_pred / Error: {result['error_ref']}")
-    print(f"I_ref - I_trapez / Error: {result['error_ref-calculated']}")
-    print("-" * 30)
+csv_file_path = 'results.csv'
+
+with open(csv_file_path, mode='a', newline='') as file:
+    writer = csv.writer(file)
+    for name, result in sorted(results.items(), key=lambda x: x[1]['error_ref']):
+        writer.writerow([
+            name,
+            result['loss'],
+            result['mae'],
+            result['error'],
+            result['error_ref'],
+            result['error_ref-calculated']
+        ])
+
+        print(f"Loss Function: {name}")
+        print(f"Test Loss: {result['loss']}")
+        print(f"Test MAE: {result['mae']}")
+        print(f"I_trapez - I_pred / Error: {result['error']}")
+        print(f"I_ref - I_pred / Error: {result['error_ref']}")
+        print(f"I_ref - I_trapez / Error: {result['error_ref-calculated']}")
+        print("-" * 30)
