@@ -1,6 +1,6 @@
 import pandas as pd
 
-csv_file_path = 'results.csv'
+csv_file_path = 'results-b.csv'
 
 df = pd.read_csv(csv_file_path).groupby("Loss Function")
 df = df.agg({

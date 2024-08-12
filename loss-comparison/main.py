@@ -99,7 +99,7 @@ for name, loss_fn in loss_functions.items():
         'error_ref-calculated': np.abs(integral_ref[0] - integral_calc)
     }
 
-csv_file_path = 'results.csv'
+csv_file_path = 'results-d.csv'
 
 with open(csv_file_path, mode='a', newline='') as file:
     writer = csv.writer(file)
