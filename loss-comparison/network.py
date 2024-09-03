@@ -80,28 +80,25 @@ def train(fun, csv_file_path):
         z_calc = fun(x, y)
         integral_calc = sp.integrate.trapezoid(z_calc * gamma_dot(t), t)
 
-        integral_ref = sp.integrate.quad(get_weg(fun), t_start, t_end)
-
-        error = np.abs(integral_calc - integral_pred)
-        error_ref = np.abs(integral_ref[0] - integral_pred)
+        integral_ref, error_ref = sp.integrate.quad(get_weg(fun), t_start, t_end)
 
         results[name] = {
             'loss': test_loss,
             'mae': test_mae,
             'history': history.history,
-            'error': error,
-            'error_ref': error_ref,
-            'error_ref-calculated': np.abs(integral_ref[0] - integral_calc)
+            'reference': integral_ref,
+            'predicted': integral_pred,
+            'calculated': integral_calc,
         }
 
     with open(csv_file_path, mode='a', newline='') as file:
         writer = csv.writer(file)
-        for name, result in sorted(results.items(), key=lambda x: x[1]['error_ref']):
+        for name, result in results.items():
             writer.writerow([
                 name,
                 result['loss'],
                 result['mae'],
-                result['error'],
-                result['error_ref'],
-                result['error_ref-calculated']
+                result['reference'],
+                result['predicted'],
+                result['calculated']
             ])
