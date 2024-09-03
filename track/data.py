@@ -18,12 +18,13 @@ def read_data() -> tuple[ndarray[float, dtype[Any]], ndarray[float, dtype[Any]]]
 
 def read_data_interpolated() -> tuple[ndarray[float, dtype[Any]], ndarray[float, dtype[Any]]]:
     data, x_vals = read_data()
-    x_vals_fine = np.arange(0, 409.6, 0.005)
+    x_vals_fine = np.arange(0, 409.6, 0.001)
 
     return np.interp(x_vals_fine, x_vals, data), x_vals_fine
 
 if __name__ == '__main__':
-    data, x_vals = read_data()
+    data, x_vals = read_data_interpolated()
+    print(np.shape(data))
 
     plt.figure()
     nn_x = np.linspace(0, 409.6, 10000)

@@ -6,7 +6,7 @@ from numpy import ndarray
 
 class NeuralNetwork:
     def __init__(self, features: ndarray, labels: ndarray):
-        self.checkpoint_path = "models/sequential-interpolated-4096-500.model.keras"
+        self.checkpoint_path = "models/sequential-interpolated-2048_5-5000.model.keras"
 
         x_train, x_valid, y_train, y_valid = train_test_split(features, labels, test_size=0.33, shuffle=True)
 
@@ -30,7 +30,7 @@ class NeuralNetwork:
             self.train_features,
             self.train_labels,
             batch_size=320,
-            epochs=500,
+            epochs=5000,
             initial_epoch=0,
             validation_data=(self.validation_features, self.validation_labels),
             callbacks=[model_checkpoint_callback]
@@ -55,11 +55,11 @@ class NeuralNetwork:
         model = Sequential([
             Input(shape=(1,)),
             feature_normalizer,
-            layers.Dense(4096, activation='relu'),
-            layers.Dense(4096, activation='relu'),
-            layers.Dense(4096, activation='relu'),
-            layers.Dense(4096, activation='relu'),
-            layers.Dense(4096, activation='relu'),
+            layers.Dense(2048, activation='relu'),
+            layers.Dense(2048, activation='relu'),
+            layers.Dense(2048, activation='relu'),
+            layers.Dense(2048, activation='relu'),
+            layers.Dense(2048, activation='relu'),
             layers.Dense(1, activation="linear")
         ])
 
