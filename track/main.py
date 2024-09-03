@@ -6,21 +6,21 @@ from neural_network import NeuralNetwork
 from simulation.track.data import read_data_interpolated
 
 if __name__ == '__main__':
-    data, x_vals = read_data_interpolated()
+    data, x_vals = read_data()
 
     nn = NeuralNetwork(x_vals, data)
-    # nn.load()
+    nn.load()
 
-    nn.create_model()
-    history = nn.train()
+    # nn.create_model()
+    # history = nn.train()
 
-    plt.figure()
-    plt.plot(history.history['loss'], label='Training Loss')
-    plt.plot(history.history['val_loss'], label='Validation Loss')
-    plt.title('Model Loss Over Epochs')
-    plt.xlabel('Epochs')
-    plt.ylabel('Loss')
-    plt.legend()
+    # plt.figure()
+    # plt.plot(history.history['loss'], label='Training Loss')
+    # plt.plot(history.history['val_loss'], label='Validation Loss')
+    # plt.title('Model Loss Over Epochs')
+    # plt.xlabel('Epochs')
+    # plt.ylabel('Loss')
+    # plt.legend()
 
     plt.figure()
     nn_x = np.linspace(0, 409.6, 10000)
