@@ -6,7 +6,7 @@ from numpy import ndarray
 
 class NeuralNetwork:
     def __init__(self, features: ndarray, labels: ndarray):
-        self.checkpoint_path = "models/sequential-noninterpolated-2048_5-5000.model.keras"
+        self.checkpoint_path = "keras/sequential-noninterpolated-2048_5-5000.model.keras"
 
         x_train, x_valid, y_train, y_valid = train_test_split(features, labels, test_size=0.33, shuffle=True)
 
