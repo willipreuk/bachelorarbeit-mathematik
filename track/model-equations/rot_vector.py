@@ -15,7 +15,7 @@ def rot_vector(crot, crotp, phi, phip, vec0):
 
     a_rot = np.array([[np.cos(phi), -np.sin(phi)], [np.sin(phi), np.cos(phi)]])
 
-    a_rot_p = phip @ np.array([[-np.sin(phi), -np.cos(phi)], [np.cos(phi), -np.sin(phi)]])
+    a_rot_p = phip * np.array([[-np.sin(phi), -np.cos(phi)], [np.cos(phi), -np.sin(phi)]])
 
     vec = crot + a_rot @ vec0
     vecp = crotp + a_rot_p @ vec0

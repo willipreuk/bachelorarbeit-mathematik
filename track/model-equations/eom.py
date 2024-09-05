@@ -7,12 +7,13 @@ from force_moments import f2mon
 from params import Params
 
 
-def eval_eom(t, q, qp):
+def eval_eom(t, q, qp, param_hfa=Params.hfa):
     """Evaluation of equations of motion.
 
     :arg t: time
     :arg q: position vector [ z_a; z_s; \phi_a; \phi_s ]
     :arg qp: velocity vector [ \dot{z}_a; \dot{z}_s; \dot{\phi}_a; \dot{\phi}_s ]
+    :param param_hfa:
     """
 
     z_a = q[0]
@@ -44,7 +45,7 @@ def eval_eom(t, q, qp):
     qss_r, qssp_r = rot_vector(crot_s, crotp_s, phi_s, phip_s,
                                np.array([Params.bshalb, - Params.hfs - Params.hss]).transpose())
 
-    qva, qvap = rot_vector(crot_a, crotp_a, phi_a, phip_a, np.array([0, -Params.hfa]).transpose())
+    qva, qvap = rot_vector(crot_a, crotp_a, phi_a, phip_a, np.array([0, -param_hfa]).transpose())
     qvs, qvsp = rot_vector(crot_s, crotp_s, phi_s, phip_s, np.array([0, 0]).transpose())
 
     # contact points wheel in the inertial system (set to be exactly below wheel)
@@ -84,3 +85,89 @@ def eval_eom(t, q, qp):
     phipp_s = (mss_l + mss_r + mvs) / (Params.Js + Params.ms * Params.hfs ** 2)
 
     return np.array([zpp_a, zpp_s, phipp_a, phipp_s]).transpose()
+
+
+def eval_eom_ode(t, xx):
+    """Evaluation of equations of motion for ODE solver.
+
+    :arg t: time
+    :arg xx: actual state vector
+    :returns: derivative of state vector
+    """
+
+    q = xx[0:4]
+    qp = xx[4:8]
+    qpp = eval_eom(t, q, qp)
+    xxp = np.zeros(2 * Params.nq)
+
+    xxp[0:4] = qp
+    xxp[4:8] = qpp
+
+    return xxp
+
+
+def eval_eom_ini():
+    """Evaluation of initial conditions for the equations of motion.
+
+    :returns: vector of initial position coordinates [ z_a; z_s; \phi_a; \phi_s ]
+    """
+
+    time = 0
+
+    q_act = np.array([Params.hza, Params.hza - Params.hsa + Params.hss, 0, 0])
+    qp_act = np.zeros(Params.nq)
+
+    tol = 1e-10
+    max_iterations = 20
+    max_norm = 1.0e8
+    eps = np.finfo(float).eps
+
+    iteration = 0
+    act_norm = 0.0
+
+    param_hfa = Params.hfa
+
+    while act_norm > tol * (1 + np.linalg.norm(q_act)) or iteration == 0:
+        qactpp0 = eval_eom(time, q_act, qp_act, param_hfa)
+
+        jacobian = np.zeros([Params.nq, Params.nq])
+
+        for j in range(Params.nq):
+            if j == 1:
+                delta = np.sqrt(eps) * np.max([np.abs(param_hfa), np.sqrt(np.sqrt(eps))])
+                q_save = param_hfa
+                param_hfa = param_hfa + delta
+            else:
+                delta = np.sqrt(eps) * np.max([np.abs(q_act[j]), np.sqrt(np.sqrt(eps))])
+                q_save = q_act[j]
+                q_act[j] = q_act[j] + delta
+
+            qactpp = eval_eom(time, q_act, qp_act, param_hfa)
+            jacobian[:, j] = (qactpp - qactpp0) / delta
+
+            if j == 1:
+                param_hfa = q_save
+            else:
+                q_act[j] = q_save
+
+        q_new = np.linalg.solve(jacobian, qactpp0)
+        act_norm = np.linalg.norm(q_new)
+
+        if act_norm > max_norm:
+            print("Newton iteration did not converge")
+            return None
+
+        q_act = q_act - q_new
+        q_act[1] = q_act[0] - Params.hsa + Params.hss
+        param_hfa = param_hfa - q_new[1]
+
+        iteration += 1
+
+        if iteration > max_iterations:
+            print("Newton iteration did not converge")
+            return None
+
+    q = q_act
+    q[1] = q[0] - Params.hsa + Params.hss
+
+    return q
