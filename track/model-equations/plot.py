@@ -23,6 +23,8 @@ def plot():
     q_ini = eval_eom_ini()
     q_0 = np.zeros(2 * Params.nq)
     q_0[0:4] = q_ini
+
+    print(q_0)
     sol = sp.integrate.solve_ivp(eval_eom_ode, [0, Params.te], q_0, t_eval=t)
 
 
