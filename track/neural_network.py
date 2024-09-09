@@ -8,11 +8,12 @@ from numpy import ndarray
 
 class NeuralNetwork:
     def __init__(self, features: ndarray, labels: ndarray):
-        self.checkpoint_path = "keras-models/sequential-interpolated-1024_2-50000.model.keras"
+        self.checkpoint_path = "keras-models/truncated-sequential-interpolated-512_2-1500.model.keras"
 
         x_train, x_valid, y_train, y_valid = train_test_split(features, labels, test_size=0.33, shuffle=True)
 
         self.scale = (1 - np.mean(y_train)) / np.sqrt(np.var(y_train))
+        self.scale = 1
         print("Scale: ", self.scale)
         self.train_features = x_train
         self.train_labels = y_train * self.scale
@@ -25,14 +26,15 @@ class NeuralNetwork:
         model_checkpoint_callback = callbacks.ModelCheckpoint(
             filepath=self.checkpoint_path,
             monitor='loss',
-            save_best_only=True
+            save_best_only=True,
+            save_freq=100
         )
 
         return self.model.fit(
             self.train_features,
             self.train_labels,
-            batch_size=320,
-            epochs=50000,
+            batch_size=1,
+            epochs=20000,
             initial_epoch=0,
             validation_data=(self.validation_features, self.validation_labels),
             callbacks=[model_checkpoint_callback]
@@ -57,14 +59,16 @@ class NeuralNetwork:
         model = Sequential([
             Input(shape=(1,)),
             feature_normalizer,
-            layers.Dense(1024, activation='relu'),
-            layers.Dense(1024, activation='relu'),
+            layers.Dense(512, activation='relu'),
+            layers.Dense(512, activation='relu'),
             layers.Dense(1, activation="linear")
         ])
 
         model.compile(
-            optimizer=optimizers.Adam(0.00001),
+            optimizer=optimizers.Adam(),
             loss=losses.mean_squared_error,
         )
+
+        print(model.summary())
 
         self.model = model

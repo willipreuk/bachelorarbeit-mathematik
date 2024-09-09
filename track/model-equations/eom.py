@@ -1,11 +1,13 @@
 import numpy as np
 
-from excitations import sim_time_excitations, spline_time_excitations
+from excitations import Excitations
 from rot_vector import rot_vector
 from force_spring import f_spring
 from force_moments import f2mon
 from params import Params
 
+excitation = Excitations()
+time_excitation = excitation.sim_time_excitations
 
 def eval_eom(t, q, qp, param_hfa=Params.hfa):
     """Evaluation of equations of motion.
@@ -26,7 +28,7 @@ def eval_eom(t, q, qp, param_hfa=Params.hfa):
     phip_s = qp[3]
 
     # evaluate external excitations
-    ur_l, ur_r, urp_l, urp_r = spline_time_excitations(t)
+    ur_l, ur_r, urp_l, urp_r = time_excitation(t)
 
     # compute all couple markers and their time derivatives
     crot_a = np.array([0, z_a]).transpose()

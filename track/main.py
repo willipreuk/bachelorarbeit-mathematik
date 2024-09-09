@@ -6,25 +6,25 @@ from neural_network import NeuralNetwork
 from simulation.track.data import read_data_interpolated
 
 if __name__ == '__main__':
-    data, x_vals = read_data_interpolated()
+    data, x_vals = read_data()
 
     nn = NeuralNetwork(x_vals, data)
-    # nn.load()
+    nn.load()
 
-    nn.create_model()
-    history = nn.train()
+    #nn.create_model()
+    #history = nn.train()
 
     plt.figure()
-    plt.plot(history.history['loss'], label='Training Loss')
-    plt.plot(history.history['val_loss'], label='Validation Loss')
+    #plt.plot(history.history['loss'], label='Training Loss')
+    #plt.plot(history.history['val_loss'], label='Validation Loss')
     plt.title('Model Loss Over Epochs')
     plt.xlabel('Epochs')
     plt.ylabel('Loss')
     plt.legend()
 
-    nn_x = np.arange(0, 409.6, 0.05)
+    nn_x = np.arange(0, 10, 0.005)
     predicted = nn.predict(nn_x)
-    plot_freq(predicted, nn_x[1] - nn_x[0])
+    # plot_freq(predicted, nn_x[1] - nn_x[0])
 
     plt.figure()
     plt.plot(nn_x, nn.predict(nn_x))
