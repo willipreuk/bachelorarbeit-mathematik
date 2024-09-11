@@ -1,38 +1,47 @@
+from dbm import error
+
 import matplotlib.pyplot as plt
 import numpy as np
+import scipy as sp
 
 from data import read_data
 from keras import layers, Input, Sequential, callbacks, models, optimizers, ops, losses, saving
 from sklearn.model_selection import train_test_split
 import os
 
+from simulation.track.data import read_test_data, test_function
 
-@saving.register_keras_serializable()
-class CustomLoss():
-    def __init__(self, error_weight, first_diff_weight, name="custom_loss", **kwargs):
-        self.error_weight = error_weight
-        self.first_diff_weight = first_diff_weight * (1 - error_weight)
-        self.second_diff_weight = (1 - first_diff_weight) * (1 - error_weight)
+error_weight = 0.75
+first_diff_weight = 0.5
 
-    def __call__(self, y_true, y_pred):
-        error = ops.mean(ops.abs(y_true - y_pred), axis=-1)
-        first_diff = ops.mean(ops.square(ops.diff(y_pred, axis=0)))
-        second_diff = ops.mean(ops.square(ops.diff(y_pred, n=2, axis=0)))
 
-        return self.error_weight * error + self.first_diff_weight * first_diff + self.second_diff_weight * second_diff
+def custom_loss(y_true, y_pred):
+    error = losses.mean_absolute_error(y_true, y_pred)
+    first_diff = ops.mean(ops.square(ops.diff(y_pred, axis=0)))
+    second_diff = ops.mean(ops.square(ops.diff(y_pred, n=2, axis=0)))
+
+    return (error_weight * error
+            + (1 - error_weight) * first_diff_weight * first_diff
+            + (1 - error_weight) * (1 - first_diff_weight) * second_diff)
 
 
 def train_nn():
-    model_path = "keras-models/512_2_relu.model.keras"
+    model_path = "keras-models/TEST2_252_2_relu_error1_diff0.model.keras"
     data, x_vals = read_data()
 
-    x_train, x_valid, y_train, y_valid = train_test_split(x_vals, data, test_size=0.5, shuffle=True)
+    print("Data shape: ", data.shape)
+    print("x_vals shape: ", x_vals.shape)
+
+    x_train = x_vals
+    y_train = data
+    x_valid = x_vals
+    y_valid = data
 
     feature_normalizer = layers.Normalization(axis=None)
     feature_normalizer.adapt(x_train)
 
     if os.path.exists(model_path):
-        model = models.load_model(model_path)
+        model = models.load_model(model_path, custom_objects={'custom_loss': custom_loss})
         print("Model loaded")
     else:
         model = Sequential([
@@ -47,7 +56,7 @@ def train_nn():
 
         model.compile(
             optimizer=optimizers.Adam(),
-            loss=CustomLoss(0.2, 0.75),
+            loss=custom_loss,
         )
 
     print(model.summary())
@@ -63,8 +72,8 @@ def train_nn():
         x_train,
         y_train,
         # batch size must be min 3 for diff to work
-        batch_size=32,
-        epochs=15000,
+        batch_size=16,
+        epochs=3000,
         initial_epoch=0,
         validation_data=(x_valid, y_valid),
         # callbacks=[model_checkpoint_callback]
@@ -81,8 +90,26 @@ def train_nn():
     nn_x = np.arange(0, 10, 0.0001)
 
     plt.figure()
-    plt.plot(nn_x, model.predict(nn_x))
-    plt.plot(x_vals, data, 'x')
+
+    # model data
+    plt.plot(nn_x, model.predict(nn_x), label="NN")
+
+    # filtered spline
+    fft_result = np.fft.fft(data)
+    fft_freq = np.fft.fftfreq(len(data), d=x_vals[1] - x_vals[0])
+    cutoff_freq = 0.75
+    fft_result[np.abs(fft_freq) > cutoff_freq] = 0
+    filtered_signal = np.fft.ifft(fft_result)
+    plt.plot(nn_x, sp.interpolate.CubicSpline(x_vals, filtered_signal)(nn_x), label="Filtered spline")
+
+    # real data
+    # plt.plot(nn_x, test_function(nn_x), 'r')
+
+    plt.plot(x_vals, data, 'x', label="data")
+    # plt.plot(x_valid, y_valid, 'bx')
+
+    plt.title('Model vs Data')
+    plt.legend()
     plt.show()
 
 
