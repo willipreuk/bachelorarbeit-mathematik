@@ -5,10 +5,10 @@ import matplotlib.pyplot as plt
 
 file_path = "data/Hhwayli.dat"
 
-s_end = 10
+t_end = 10
 
 def read_data() -> tuple[ndarray[float, dtype[Any]], ndarray[float, dtype[Any]]]:
-    x_vals = np.arange(0, s_end, 0.05)
+    x_vals = np.arange(0, t_end, 0.089993)
     # x_vals_test = np.arange(0, 10, 0.01)
 
     with open(file_path, "r") as file:
@@ -25,7 +25,7 @@ def read_data() -> tuple[ndarray[float, dtype[Any]], ndarray[float, dtype[Any]]]
 
 def read_data_interpolated() -> tuple[ndarray[float, dtype[Any]], ndarray[float, dtype[Any]]]:
     data, x_vals = read_data()
-    x_vals_fine = np.arange(0, s_end, 0.0001)
+    x_vals_fine = np.arange(0, t_end, 0.0001)
 
     data_fine = np.interp(x_vals_fine, x_vals, data)
     print("Shape of data: ", data_fine.shape)

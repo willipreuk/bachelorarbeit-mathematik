@@ -2,23 +2,24 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 from data import read_data
-from keras import layers, Input, Sequential, callbacks, models, optimizers, ops, losses
+from keras import layers, Input, Sequential, callbacks, models, optimizers, ops, losses, saving
 from sklearn.model_selection import train_test_split
 import os
-import tensorflow as tf
-
-error_weight = 0.2
-first_diff_weight = 0.75 * (1 - error_weight)
-second_diff_weight = 0.25 * (1 - error_weight)
 
 
-def custom_loss(y_true, y_pred):
-    error = ops.mean(ops.abs(y_true - y_pred), axis=-1)
-    first_diff = ops.mean(ops.square(ops.diff(y_pred, axis=0)))
-    second_diff = ops.mean(ops.square(ops.diff(y_pred, n=2, axis=0)))
-    # tf.print("Error: ", error, "First Diff: ", first_diff, "Second Diff: ", second_diff)
+@saving.register_keras_serializable()
+class CustomLoss():
+    def __init__(self, error_weight, first_diff_weight, name="custom_loss", **kwargs):
+        self.error_weight = error_weight
+        self.first_diff_weight = first_diff_weight * (1 - error_weight)
+        self.second_diff_weight = (1 - first_diff_weight) * (1 - error_weight)
 
-    return error_weight * error + first_diff_weight * first_diff + second_diff_weight * second_diff
+    def __call__(self, y_true, y_pred):
+        error = ops.mean(ops.abs(y_true - y_pred), axis=-1)
+        first_diff = ops.mean(ops.square(ops.diff(y_pred, axis=0)))
+        second_diff = ops.mean(ops.square(ops.diff(y_pred, n=2, axis=0)))
+
+        return self.error_weight * error + self.first_diff_weight * first_diff + self.second_diff_weight * second_diff
 
 
 def train_nn():
@@ -38,13 +39,15 @@ def train_nn():
             Input(shape=(1,)),
             feature_normalizer,
             layers.Dense(128, activation='relu'),
+            layers.Dropout(0.2),
             layers.Dense(128, activation='relu'),
+            layers.Dropout(0.2),
             layers.Dense(1, activation="linear")
         ])
 
         model.compile(
             optimizer=optimizers.Adam(),
-            loss=custom_loss,
+            loss=CustomLoss(0.2, 0.75),
         )
 
     print(model.summary())
@@ -60,8 +63,8 @@ def train_nn():
         x_train,
         y_train,
         # batch size must be min 3 for diff to work
-        batch_size=64,
-        epochs=10000,
+        batch_size=32,
+        epochs=15000,
         initial_epoch=0,
         validation_data=(x_valid, y_valid),
         # callbacks=[model_checkpoint_callback]
