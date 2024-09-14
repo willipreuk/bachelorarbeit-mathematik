@@ -3,11 +3,18 @@ import matplotlib.pyplot as plt
 from config import Config, Excitations
 
 
-def _simulated_excitation(t):
+def simulated_excitation(t):
     data_l = 0.1 * np.sin(2 * np.pi * (t + 0.4))
     data_r = 0.1 * np.sin(2 * np.pi * (t + 0.1))
 
     return data_l, data_r
+
+
+def simulated_diff_excitation(t):
+    data_l_diff = 0.1 * np.cos(2 * np.pi * (t + 0.4)) * 2 * np.pi
+    data_r_diff = 0.1 * np.cos(2 * np.pi * (t + 0.1)) * 2 * np.pi
+
+    return data_l_diff, data_r_diff
 
 
 def read_data():
@@ -27,7 +34,8 @@ def read_data():
         data_l = np.array(data_l[:len(x_vals)])
 
     else:
-        data_l, data_r = _simulated_excitation(x_vals)
+        x_vals = np.arange(0, Config.t_end, Config.delta_t / 10)
+        data_l, data_r = simulated_excitation(x_vals)
 
     return data_l, data_r, x_vals
 

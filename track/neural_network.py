@@ -1,3 +1,5 @@
+from matplotlib import pyplot as plt
+
 from data import read_data
 from keras import layers, Input, Sequential, callbacks, models, optimizers, ops, losses, saving
 from config import NeuralNetworkConfig
@@ -22,10 +24,10 @@ def _load_model():
         print("Model loaded")
     else:
         # use only the left side for normalizing, mean and variance should be the same
-        data_l = read_data()[0]
+        _, _, x_vals = read_data()
 
         feature_normalizer = layers.Normalization(axis=None)
-        feature_normalizer.adapt(data_l)
+        feature_normalizer.adapt(x_vals)
 
         model = Sequential([
             Input(shape=(1,)),
@@ -74,12 +76,22 @@ def train_nn():
         y_train,
         # batch size must be min 3 for diff to work
         batch_size=16,
-        epochs=3000,
-        initial_epoch=0,
+        epochs=NeuralNetworkConfig.epochs,
         validation_data=(x_valid, y_valid),
         callbacks=[model_checkpoint_callback]
     )
 
+    plt.figure()
+    plt.plot(history.history['loss'], label='loss')
+    plt.plot(history.history['val_loss'], label='val_loss')
+    plt.title('Model loss')
+    plt.legend()
+
+    plt.figure()
+    plt.plot(x_vals, data, "x", label="Data")
+    plt.plot(x_vals, _model.predict(x_vals), label="NN")
+
+
 
 def predict(t):
-    return _model.predict(t)
+    return _model.predict(t, verbose=0)

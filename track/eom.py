@@ -1,13 +1,66 @@
 import numpy as np
 
-from excitations import Excitations
-from rot_vector import rot_vector
-from force_spring import f_spring
-from force_moments import f2mon
-from params import Params
+from excitations import time_excitations
+from model_params import Params
 
-excitation = Excitations()
-time_excitation = excitation.sim_time_excitations
+
+def _f_spring(c, d, m, cfrom, cfromp, cto, ctop):
+    """Force of a linear spring.
+
+    :arg c: spring constant
+    :arg d: damping rate
+    :arg m: mass
+    :arg cfrom: position of from marker
+    :arg cfromp: velocity of from marker
+    :arg cto: position of to marker
+    :arg ctop: velocity of to marker
+    :returns: force vector
+    """
+
+    k = 2 * d * np.sqrt(m * c)
+    slen = np.linalg.norm(cfrom - cto)
+
+    f = c * slen + k * np.sum((cto - cfrom) * (ctop - cfromp)) / slen
+
+    return f * (cto - cfrom) / slen
+
+
+def _f2mon(crot, cforce, force):
+    """Conversion of Forces TWO Moments
+
+    :arg crot: position of the centre of rotation
+    :arg cforce: position of force marker
+    :arg force: force vector
+    :return: moment
+    """
+
+    rvec = cforce - crot
+
+    return rvec[0] * force[1] - rvec[1] * force[0]
+
+
+def _rot_vector(crot, crotp, phi, phip, vec0):
+    """Planar Rotation and shift of Vectors.
+
+    :arg crot: position of the centre of rotation
+    :arg crotp: velocity of the centre of rotation
+    :arg phi: angle of rotation
+    :arg phip: time derivative of the angle of rotation
+    :arg vec0: input vector
+
+    :returns: position vector in Cartesian coordinates
+    :returns: velocity vector in Cartesian coordinates
+    """
+
+    a_rot = np.array([[np.cos(phi), -np.sin(phi)], [np.sin(phi), np.cos(phi)]])
+
+    a_rot_p = phip * np.array([[-np.sin(phi), -np.cos(phi)], [np.cos(phi), -np.sin(phi)]])
+
+    vec = crot + a_rot @ vec0
+    vecp = crotp + a_rot_p @ vec0
+
+    return vec, vecp
+
 
 def eval_eom(t, q, qp, param_hfa=Params.hfa):
     """Evaluation of equations of motion.
@@ -28,7 +81,7 @@ def eval_eom(t, q, qp, param_hfa=Params.hfa):
     phip_s = qp[3]
 
     # evaluate external excitations
-    ur_l, ur_r, urp_l, urp_r = time_excitation(t)
+    ur_l, ur_r, urp_l, urp_r = time_excitations(t)
 
     # compute all couple markers and their time derivatives
     crot_a = np.array([0, z_a]).transpose()
@@ -36,19 +89,19 @@ def eval_eom(t, q, qp, param_hfa=Params.hfa):
     crot_s = np.array([0, z_s + Params.hfs]).transpose()
     crotp_s = np.array([0, zp_s]).transpose()
 
-    qr_l, qrp_l = rot_vector(crot_a, crotp_a, phi_a, phip_a, np.array([Params.shalb, - Params.hza]).transpose())
-    qr_r, qrp_r = rot_vector(crot_a, crotp_a, phi_a, phip_a, np.array([-Params.shalb, - Params.hza]).transpose())
+    qr_l, qrp_l = _rot_vector(crot_a, crotp_a, phi_a, phip_a, np.array([Params.shalb, - Params.hza]).transpose())
+    qr_r, qrp_r = _rot_vector(crot_a, crotp_a, phi_a, phip_a, np.array([-Params.shalb, - Params.hza]).transpose())
 
-    qsa_l, qsap_l = rot_vector(crot_a, crotp_a, phi_a, phip_a, np.array([Params.bahalb, - Params.hsa]).transpose())
-    qsa_r, qsap_r = rot_vector(crot_a, crotp_a, phi_a, phip_a, np.array([-Params.bahalb, - Params.hsa]).transpose())
+    qsa_l, qsap_l = _rot_vector(crot_a, crotp_a, phi_a, phip_a, np.array([Params.bahalb, - Params.hsa]).transpose())
+    qsa_r, qsap_r = _rot_vector(crot_a, crotp_a, phi_a, phip_a, np.array([-Params.bahalb, - Params.hsa]).transpose())
 
-    qss_l, qssp_l = rot_vector(crot_s, crotp_s, phi_s, phip_s,
-                               np.array([Params.bshalb, -Params.hfs - Params.hss]).transpose())
-    qss_r, qssp_r = rot_vector(crot_s, crotp_s, phi_s, phip_s,
-                               np.array([Params.bshalb, - Params.hfs - Params.hss]).transpose())
+    qss_l, qssp_l = _rot_vector(crot_s, crotp_s, phi_s, phip_s,
+                                np.array([Params.bshalb, -Params.hfs - Params.hss]).transpose())
+    qss_r, qssp_r = _rot_vector(crot_s, crotp_s, phi_s, phip_s,
+                                np.array([Params.bshalb, - Params.hfs - Params.hss]).transpose())
 
-    qva, qvap = rot_vector(crot_a, crotp_a, phi_a, phip_a, np.array([0, -param_hfa]).transpose())
-    qvs, qvsp = rot_vector(crot_s, crotp_s, phi_s, phip_s, np.array([0, 0]).transpose())
+    qva, qvap = _rot_vector(crot_a, crotp_a, phi_a, phip_a, np.array([0, -param_hfa]).transpose())
+    qvs, qvsp = _rot_vector(crot_s, crotp_s, phi_s, phip_s, np.array([0, 0]).transpose())
 
     # contact points wheel in the inertial system (set to be exactly below wheel)
     qrini_l = np.array([qr_l[0], ur_l]).transpose()
@@ -57,28 +110,28 @@ def eval_eom(t, q, qp, param_hfa=Params.hfa):
     qrinip_r = np.array([qrp_r[0], urp_r]).transpose()
 
     # spring forces and momenta
-    fr_l = f_spring(Params.cr, Params.dr, Params.ma, qr_l, qrp_l, qrini_l, qrinip_l)
-    fr_r = f_spring(Params.cr, Params.dr, Params.ma, qr_r, qrp_r, qrini_r, qrinip_r)
+    fr_l = _f_spring(Params.cr, Params.dr, Params.ma, qr_l, qrp_l, qrini_l, qrinip_l)
+    fr_r = _f_spring(Params.cr, Params.dr, Params.ma, qr_r, qrp_r, qrini_r, qrinip_r)
 
-    fs_l = f_spring(Params.cqf, Params.dqf, (Params.ms + Params.ma), qss_l, qssp_l, qsa_l, qsap_l)
-    fs_r = f_spring(Params.cqf, Params.dqf, (Params.ms + Params.ma), qss_r, qssp_r, qsa_r, qsap_r)
+    fs_l = _f_spring(Params.cqf, Params.dqf, (Params.ms + Params.ma), qss_l, qssp_l, qsa_l, qsap_l)
+    fs_r = _f_spring(Params.cqf, Params.dqf, (Params.ms + Params.ma), qss_r, qssp_r, qsa_r, qsap_r)
 
     c_from = np.array([qva[0], z_s + np.cos(phi_s) * Params.hfs]).transpose()
     c_fromp = np.array([qvap[0], zp_s - np.sin(phi_s) * phip_s * Params.hfs]).transpose()
 
-    fv = f_spring(Params.clf, Params.dlf, Params.ms, c_from, c_fromp, qva, qvap)
+    fv = _f_spring(Params.clf, Params.dlf, Params.ms, c_from, c_fromp, qva, qvap)
     fv[0] = 0
 
-    mr_l = f2mon(crot_a, qr_l, fr_l)
-    mr_r = f2mon(crot_a, qr_r, fr_r)
+    mr_l = _f2mon(crot_a, qr_l, fr_l)
+    mr_r = _f2mon(crot_a, qr_r, fr_r)
 
-    msa_l = f2mon(crot_a, qsa_l, -fs_l)
-    msa_r = f2mon(crot_a, qsa_r, -fs_r)
-    mss_l = f2mon(crot_s, qss_l, fs_l)
-    mss_r = f2mon(crot_s, qss_r, fs_r)
+    msa_l = _f2mon(crot_a, qsa_l, -1 * fs_l)
+    msa_r = _f2mon(crot_a, qsa_r, -1 * fs_r)
+    mss_l = _f2mon(crot_s, qss_l, fs_l)
+    mss_r = _f2mon(crot_s, qss_r, fs_r)
 
-    mva = f2mon(crot_a, qva, -fv)
-    mvs = f2mon(crot_s, qvs, fv)
+    mva = _f2mon(crot_a, qva, -1 * fv)
+    mvs = _f2mon(crot_s, qvs, fv)
 
     zpp_a = (fr_l[1] + fr_r[1] - fs_l[1] - fs_r[1] - fv[1]) / Params.ma
     zpp_s = (fs_l[1] + fs_r[1] + fv[1]) / Params.ms - Params.g

@@ -13,9 +13,11 @@ class NeuralNetworkConfig:
 
     model_path = "keras-models/TEST2_252_2_relu_error1_diff0.model.keras"
 
+    epochs = 1000
+
 
 class Config:
-    excitation = Excitations.DATA_SPLINE
+    excitation = Excitations.DATA_NEURAL_NETWORK
 
     t_end = 10
     delta_t = 0.089993
