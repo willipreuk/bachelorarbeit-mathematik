@@ -1,78 +1,73 @@
-from typing import Any
 import numpy as np
-from numpy import ndarray, dtype
 import matplotlib.pyplot as plt
-
-file_path = "data/Hhwayli.dat"
-
-t_end = 10
-delta_t = 0.089993
-
-def read_data() -> tuple[ndarray[float, dtype[Any]], ndarray[float, dtype[Any]]]:
-    x_vals = np.arange(0, t_end, delta_t)
-    # x_vals_test = np.arange(0, 10, 0.01)
-
-    with open(file_path, "r") as file:
-        data = file.readlines()
-        data = [float(x) for x in data]
-
-    data_values = np.array(data[:len(x_vals)])
-
-    print("Shape of data: ", data_values.shape)
-
-    return data_values, x_vals
-    # return np.array(1/10 * (np.sin(x_vals_test)*0.4)), x_vals_test
+from config import Config, Excitations
 
 
-def test_function(x):
-    return np.sin(x)
-    return 0.4 * np.sin(2 * x) * np.cos(x + np.pi) + 0.3 * np.sin(1/4 * x)
+def _simulated_excitation(t):
+    data_l = 0.1 * np.sin(2 * np.pi * (t + 0.4))
+    data_r = 0.1 * np.sin(2 * np.pi * (t + 0.1))
+
+    return data_l, data_r
 
 
-def read_test_data():
-    x_vals = np.arange(0, t_end, delta_t / 2)
+def read_data():
+    x_vals = np.arange(0, Config.t_end, Config.delta_t)
 
-    data = test_function(x_vals) + 0.2 * np.random.randn(len(x_vals))
+    if Config.excitation == Excitations.DATA_SPLINE or Config.excitation == Excitations.DATA_NEURAL_NETWORK:
+        with open(Config.data_r_path, "r") as file:
+            data_r = file.readlines()
 
-    return data, x_vals
+        data_r = [float(x) for x in data_r]
+        data_r = np.array(data_r[:len(x_vals)])
+
+        with open(Config.data_l_path, "r") as file:
+            data_l = file.readlines()
+
+        data_l = [float(x) for x in data_l]
+        data_l = np.array(data_l[:len(x_vals)])
+
+    else:
+        data_l, data_r = _simulated_excitation(x_vals)
+
+    return data_l, data_r, x_vals
 
 
-
-def read_data_interpolated() -> tuple[ndarray[float, dtype[Any]], ndarray[float, dtype[Any]]]:
-    data, x_vals = read_data()
-    x_vals_fine = np.arange(0, t_end, 0.0001)
-
-    data_fine = np.interp(x_vals_fine, x_vals, data)
-    print("Shape of data: ", data_fine.shape)
-
-    return data_fine, x_vals_fine
-
-
-def plot_data():
-    data, x_vals = read_test_data()
+def _plot_data():
+    data_l, data_r, x_vals = read_data()
 
     plt.figure()
-    nn_x = np.linspace(0, 409.6, 10000)
 
-    plt.plot(x_vals, data)
-    plt.show()
+    plt.plot(x_vals, data_l, label="Left")
+    plt.plot(x_vals, data_r, label="Right")
+
+    plt.xlabel("Time")
+    plt.ylabel("Amplitude")
+    plt.legend()
+    plt.title("Data")
 
 
-def plot_freq(data, dx):
-    fft_result = np.fft.fft(data)
-    fft_freq = np.fft.fftfreq(len(data), d=dx)
+def _plot_freq():
+    data_l, data_r, x_vals = read_data()
 
-    # Plot the FFT result
+    fft_result_l = np.fft.fft(data_l)
+    fft_freq_l = np.fft.fftfreq(len(data_r), d=data_l[1] - data_l[0])
+
+    fft_result_r = np.fft.fft(data_r)
+    fft_freq_r = np.fft.fftfreq(len(data_r), d=data_r[1] - data_r[0])
+
     plt.figure()
-    plt.stem(fft_freq, np.abs(fft_result), 'b', markerfmt=" ", basefmt="-b")
+
+    plt.stem(fft_freq_l, np.abs(fft_result_l), 'b', markerfmt=" ", basefmt="-b")
+    plt.stem(fft_freq_r, np.abs(fft_result_r), 'r', markerfmt=" ", basefmt="-b")
+
     plt.title('FFT of Data')
     plt.xlim(left=0)
     plt.xlabel('Frequency (Hz)')
     plt.ylabel('Amplitude')
-    plt.show()
 
 
 if __name__ == '__main__':
-    # data, x_vals = read_data()
-    # plot_freq(data, 0.05)
-    plot_data()
+    _plot_data()
+    _plot_freq()
+
+    plt.show()
