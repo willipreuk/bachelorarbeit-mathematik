@@ -8,12 +8,44 @@ class Excitations(Enum):
 
 
 class NeuralNetworkConfig:
-    error_weight = 1
-    first_diff_weight = 0
+    batch_size = 4
 
-    model_path = "keras-models/TEST2_252_2_relu_error1_diff0.model.keras"
+    # error_weight = 0.5
+    # first_diff_weight = 0.5
 
-    epochs = 1000
+    error_weight = 0.75
+    first_diff_weight = 1
+    model_path = "keras-models/data_1.model.keras"
+
+    # error_weight = 1
+    # first_diff_weight = 0
+    # model_path = "keras-models/data_2.model.keras"
+
+    # error_weight = 0.9
+    # first_diff_weight = 1
+    # model_path = "keras-models/data_3.model.keras"
+
+    # error_weight = 0.5
+    # first_diff_weight = 1
+    # model_path = "keras-models/data_4.model.keras"
+
+    # error_weight = 0.5
+    # first_diff_weight = 0.5
+    # model_path = "keras-models/data_5.model.keras"
+
+    # error_weight = 0.75, first_diff_weight = 1
+    # model_path = "keras-models/simulated_1.model.keras"
+
+    # error_weight = 1, first_diff_weight = 0
+    # model_path = "keras-models/simulated_2.model.keras"
+
+    # error_weight = 0.9, first_diff_weight = 1
+    # model_path = "keras-models/simulated_3.model.keras"
+
+    # error_weight = 0.5, first_diff_weight = 1
+    # model_path = "keras-models/simulated_4.model.keras"
+
+    epochs = 7500
 
 
 class Config:

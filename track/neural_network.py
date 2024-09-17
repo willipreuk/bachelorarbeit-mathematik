@@ -75,7 +75,7 @@ def train_nn():
         x_train,
         y_train,
         # batch size must be min 3 for diff to work
-        batch_size=16,
+        batch_size=NeuralNetworkConfig.batch_size,
         epochs=NeuralNetworkConfig.epochs,
         validation_data=(x_valid, y_valid),
         callbacks=[model_checkpoint_callback]
@@ -86,10 +86,6 @@ def train_nn():
     plt.plot(history.history['val_loss'], label='val_loss')
     plt.title('Model loss')
     plt.legend()
-
-    plt.figure()
-    plt.plot(x_vals, data, "x", label="Data")
-    plt.plot(x_vals, _model.predict(x_vals), label="NN")
 
 
 

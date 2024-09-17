@@ -3,10 +3,10 @@ import numpy as np
 
 class Params:
     # general data
-    nq        = 4                #           number of position coordinates
+    nq        = 4               #           number of position coordinates
 
-    g         = 9.81             # [m/s^2]   gravitational constant
-    v         = 2.0              # [m/s]     velocity
+    g         = 9.81            # [m/s^2]   gravitational constant
+    v         = 2.0             # [m/s]     velocity
     te        = 10.0            # [s]       end time
 
     q_0       = np.array([1.321364, 1.193035, 0.035618, 0.035388])

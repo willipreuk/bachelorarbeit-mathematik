@@ -4,6 +4,12 @@ from config import Config, Excitations
 
 
 def simulated_excitation(t):
+    # data_l = (0.1 * np.cos(0.4 * np.pi * (t + 0.4))
+    #           + np.heaviside(t - 5, 1) * 0.1 * np.sin(0.4 * np.pi * (t + 0.4))
+    #           + np.heaviside(t - 3, 1) * 0.1 * np.sin(0.4 * np.pi * (t + 0.4))
+    #           + np.heaviside(t - 8, 1) * 0.1 * np.sin(0.4 * np.pi * (t + 0.4))
+    #           )
+
     data_l = 0.1 * np.sin(2 * np.pi * (t + 0.4))
     data_r = 0.1 * np.sin(2 * np.pi * (t + 0.1))
 
@@ -34,7 +40,7 @@ def read_data():
         data_l = np.array(data_l[:len(x_vals)])
 
     else:
-        x_vals = np.arange(0, Config.t_end, Config.delta_t / 10)
+        x_vals = np.arange(0, Config.t_end, Config.delta_t)
         data_l, data_r = simulated_excitation(x_vals)
 
     return data_l, data_r, x_vals

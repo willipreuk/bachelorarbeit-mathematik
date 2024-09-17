@@ -20,8 +20,9 @@ def plot():
     plt.plot(t, sol.y[0], label="z_a")
     plt.plot(t, sol.y[1], label="z_s")
     plt.legend()
-    plt.show()
+
 
 
 if __name__ == '__main__':
     plot()
+    plt.show()
