@@ -10,8 +10,11 @@ def simulated_excitation(t):
     #           + np.heaviside(t - 8, 1) * 0.1 * np.sin(0.4 * np.pi * (t + 0.4))
     #           )
 
-    data_l = 0.1 * np.sin(2 * np.pi * (t + 0.4))
-    data_r = 0.1 * np.sin(2 * np.pi * (t + 0.1))
+    # data_l = 0.1 * np.sin(2 * np.pi * (t + 0.4))
+    # data_r = 0.1 * np.sin(2 * np.pi * (t + 0.1))
+
+    data_l = 0.1 * (np.sin(0.2 * np.pi * t) + np.sin(0.4 * np.pi * t) + np.sin(0.75 * np.pi * t) + np.sin(1 * np.pi * t) + np.sin(1.5 * np.pi * t))
+    data_r = 0.1 * (np.sin(0.2 * np.pi * t + 0.4) + np.sin(0.4 * np.pi * t) + np.sin(0.75 * np.pi * t) + np.sin(1 * np.pi * t) + np.sin(1.5 * np.pi * t))
 
     return data_l, data_r
 

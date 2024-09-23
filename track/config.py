@@ -8,14 +8,15 @@ class Excitations(Enum):
 
 
 class NeuralNetworkConfig:
-    batch_size = 4
+    batch_size = 128
+    epochs = 1000
 
     # error_weight = 0.5
     # first_diff_weight = 0.5
 
-    error_weight = 0.75
-    first_diff_weight = 1
-    model_path = "keras-models/data_1.model.keras"
+    # error_weight = 0.75
+    # first_diff_weight = 1
+    # model_path = "keras-models/data_1.model.keras"
 
     # error_weight = 1
     # first_diff_weight = 0
@@ -36,8 +37,9 @@ class NeuralNetworkConfig:
     # error_weight = 0.75, first_diff_weight = 1
     # model_path = "keras-models/simulated_1.model.keras"
 
-    # error_weight = 1, first_diff_weight = 0
-    # model_path = "keras-models/simulated_2.model.keras"
+    error_weight = 0.9
+    first_diff_weight = 1
+    model_path = "keras-models/simulated_2.model.keras"
 
     # error_weight = 0.9, first_diff_weight = 1
     # model_path = "keras-models/simulated_3.model.keras"
@@ -45,14 +47,13 @@ class NeuralNetworkConfig:
     # error_weight = 0.5, first_diff_weight = 1
     # model_path = "keras-models/simulated_4.model.keras"
 
-    epochs = 7500
-
 
 class Config:
-    excitation = Excitations.DATA_NEURAL_NETWORK
+    excitation = Excitations.SIMULATED
 
     t_end = 10
-    delta_t = 0.089993
+    delta_t = 0.01
+    # delta_t = 0.089993
 
     data_r_path = "data/Hhwayre.dat"
     data_l_path = "data/Hhwayli.dat"

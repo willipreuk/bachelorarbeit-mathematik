@@ -1,9 +1,11 @@
 from matplotlib import pyplot as plt
-
 from data import read_data
 from keras import layers, Input, Sequential, callbacks, models, optimizers, ops, losses, saving
 from config import NeuralNetworkConfig
+import tensorflow as tf
 import os
+
+tf.random.set_seed(21)
 
 
 def _custom_loss(y_true, y_pred):
@@ -32,10 +34,9 @@ def _load_model():
         model = Sequential([
             Input(shape=(1,)),
             feature_normalizer,
-            layers.Dense(128, activation='relu'),
-            layers.Dropout(0.2),
-            layers.Dense(128, activation='relu'),
-            layers.Dropout(0.2),
+            layers.Dense(256, activation='relu'),
+            layers.Dense(256, activation='relu'),
+            layers.Dense(256, activation='relu'),
             layers.Dense(1, activation="linear")
         ])
 
@@ -86,7 +87,6 @@ def train_nn():
     plt.plot(history.history['val_loss'], label='val_loss')
     plt.title('Model loss')
     plt.legend()
-
 
 
 def predict(t):
