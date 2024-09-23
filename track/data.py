@@ -4,29 +4,54 @@ from config import Config, Excitations
 
 
 def simulated_excitation(t):
-    # data_l = (0.1 * np.cos(0.4 * np.pi * (t + 0.4))
-    #           + np.heaviside(t - 5, 1) * 0.1 * np.sin(0.4 * np.pi * (t + 0.4))
-    #           + np.heaviside(t - 3, 1) * 0.1 * np.sin(0.4 * np.pi * (t + 0.4))
-    #           + np.heaviside(t - 8, 1) * 0.1 * np.sin(0.4 * np.pi * (t + 0.4))
-    #           )
+    """
+    Simulated excitations for the left and right track.
+    :param t:
+    :return: tuple of left and right track data
+    """
 
+    # excitations from the paper https://doi.org/10.1007/978-3-642-01356-0_20
     # data_l = 0.1 * np.sin(2 * np.pi * (t + 0.4))
     # data_r = 0.1 * np.sin(2 * np.pi * (t + 0.1))
 
-    data_l = 0.1 * (np.sin(0.2 * np.pi * t) + np.sin(0.4 * np.pi * t) + np.sin(0.75 * np.pi * t) + np.sin(1 * np.pi * t) + np.sin(1.5 * np.pi * t))
-    data_r = 0.1 * (np.sin(0.2 * np.pi * t + 0.4) + np.sin(0.4 * np.pi * t) + np.sin(0.75 * np.pi * t) + np.sin(1 * np.pi * t) + np.sin(1.5 * np.pi * t))
+    data_l = 0.01 * (np.sin(0.2 * np.pi * t) + np.sin(0.4 * np.pi * t) + np.sin(0.75 * np.pi * t) + np.sin(1 * np.pi * t) + np.sin(1.5 * np.pi * t))
+    data_r = 0.01 * (np.sin(0.2 * np.pi * t + 0.4) + np.sin(0.4 * np.pi * t) + np.sin(0.75 * np.pi * t) + np.sin(1 * np.pi * t) + np.sin(1.5 * np.pi * t))
 
     return data_l, data_r
 
 
 def simulated_diff_excitation(t):
-    data_l_diff = 0.1 * np.cos(2 * np.pi * (t + 0.4)) * 2 * np.pi
-    data_r_diff = 0.1 * np.cos(2 * np.pi * (t + 0.1)) * 2 * np.pi
+    """
+    Simulated differential excitations for the left and right track.
+    :param t:
+    :return: tuple of left and right diff track data
+    """
+
+    # diff excitation from the paper https://doi.org/10.1007/978-3-642-01356-0_20
+    # data_l_diff = 0.1 * np.cos(2 * np.pi * (t + 0.4)) * 2 * np.pi
+    # data_r_diff = 0.1 * np.cos(2 * np.pi * (t + 0.1)) * 2 * np.pi
+
+    data_l_diff = 0.01 * (0.2 * np.pi * np.cos(0.2 * np.pi * t)
+                          + 0.4 * np.pi * np.cos(0.4 * np.pi * t)
+                          + 0.75 * np.pi * np.cos(0.75 * np.pi * t)
+                          + 1 * np.pi * np.cos(1 * np.pi * t)
+                          + 1.5 * np.pi * np.cos(1.5 * np.pi * t))
+
+    data_r_diff = 0.01 * (0.2 * np.pi * np.cos(0.2 * np.pi * t + 0.4)
+                          + 0.4 * np.pi * np.cos(0.4 * np.pi * t)
+                          + 0.75 * np.pi * np.cos(0.75 * np.pi * t)
+                          + 1 * np.pi * np.cos(1 * np.pi * t)
+                          + 1.5 * np.pi * np.cos(1.5 * np.pi * t))
 
     return data_l_diff, data_r_diff
 
 
 def read_data():
+    """
+    Read data from file or generate simulated data. Which data is used is determined by the Config.excitation value.
+    :return: tuple of left and right track data and time values
+    """
+
     x_vals = np.arange(0, Config.t_end, Config.delta_t)
 
     if Config.excitation == Excitations.DATA_SPLINE or Config.excitation == Excitations.DATA_NEURAL_NETWORK:
@@ -50,6 +75,10 @@ def read_data():
 
 
 def _plot_data():
+    """
+    Plot the data which read_data() returns.
+    """
+
     data_l, data_r, x_vals = read_data()
 
     plt.figure()
@@ -64,6 +93,11 @@ def _plot_data():
 
 
 def _plot_freq():
+    """
+    Plot the frequency spectrum of the data which read_data() returns using FFT.
+    :return:
+    """
+
     data_l, data_r, x_vals = read_data()
 
     fft_result_l = np.fft.fft(data_l)

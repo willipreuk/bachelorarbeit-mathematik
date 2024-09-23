@@ -49,10 +49,10 @@ class NeuralNetworkConfig:
 
 
 class Config:
-    excitation = Excitations.SIMULATED
+    excitation = Excitations.DATA_NEURAL_NETWORK
 
     t_end = 10
-    delta_t = 0.01
+    delta_t = 0.025
     # delta_t = 0.089993
 
     data_r_path = "data/Hhwayre.dat"
