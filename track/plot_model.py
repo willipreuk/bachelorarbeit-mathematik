@@ -2,20 +2,18 @@ import numpy as np
 import scipy as sp
 import matplotlib.pyplot as plt
 
-from simulation.track.config import Config, Excitations
-from simulation.track.eom import eval_eom_ini, eval_eom_ode
+import config
+from simulation.track.eom import eval_eom_ode
 from simulation.track.excitations import time_excitations
 from simulation.track.model_params import Params
 
 
 def plot():
-    t = np.linspace(0, Config.t_end, 1000)
-    q_ini = eval_eom_ini()
+    q_ini = Params.q_0
     q_0 = np.zeros(2 * Params.nq)
     q_0[0:4] = q_ini
-    print(q_ini)
 
-    rk45 = sp.integrate.RK45(eval_eom_ode, 0, q_0, Config.t_end, atol=1e-8, rtol=1e-8)
+    rk45 = sp.integrate.RK45(eval_eom_ode, 0, q_0, config.t_end, atol=1e-8, rtol=1e-8)
 
     t_eval = []
     step_sizes = []
@@ -26,10 +24,14 @@ def plot():
         t_eval.append(rk45.t)
         y.append(rk45.y)
 
+    y = np.array(y)
+    step_sizes = np.array(step_sizes)
+    t_eval = np.array(t_eval)
+
     y = np.transpose(y)
 
     plt.figure()
-    plt.title("step sizes")
+    plt.title("step sizes and excitations (" + config.excitation.value + ")")
     plt.plot(t_eval, step_sizes, label="h")
 
     plt.plot(t_eval, time_excitations(t_eval)[0], label="left")
@@ -37,11 +39,15 @@ def plot():
     plt.legend()
 
     plt.figure()
-    plt.title("States")
+    plt.title("States (" + config.excitation.value + ")")
     plt.plot(t_eval, y[0], label="z_a")
     plt.plot(t_eval, y[1], label="z_s")
     plt.legend()
 
+
 if __name__ == '__main__':
+    config.excitation = config.Excitations.SIMULATED_SPLINE
+    plot()
+    config.excitation = config.Excitations.SIMULATED_NEURAL_NETWORK
     plot()
     plt.show()

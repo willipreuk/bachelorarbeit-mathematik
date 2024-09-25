@@ -1,6 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from config import Config, Excitations
+import config
 
 
 def simulated_excitation(t):
@@ -52,23 +52,23 @@ def read_data():
     :return: tuple of left and right track data and time values
     """
 
-    x_vals = np.arange(0, Config.t_end, Config.delta_t)
+    x_vals = np.arange(0, config.t_end, config.delta_t)
 
-    if Config.excitation == Excitations.DATA_SPLINE or Config.excitation == Excitations.DATA_NEURAL_NETWORK:
-        with open(Config.data_r_path, "r") as file:
+    if config.data_source == config.TrainData.DATA:
+        with open(config.data_r_path, "r") as file:
             data_r = file.readlines()
 
         data_r = [float(x) for x in data_r]
         data_r = np.array(data_r[:len(x_vals)])
 
-        with open(Config.data_l_path, "r") as file:
+        with open(config.data_l_path, "r") as file:
             data_l = file.readlines()
 
         data_l = [float(x) for x in data_l]
         data_l = np.array(data_l[:len(x_vals)])
 
     else:
-        x_vals = np.arange(0, Config.t_end, Config.delta_t)
+        x_vals = np.arange(0, config.t_end, config.delta_t_simulation)
         data_l, data_r = simulated_excitation(x_vals)
 
     return data_l, data_r, x_vals
