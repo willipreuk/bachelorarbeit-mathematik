@@ -3,6 +3,7 @@ import scipy as sp
 import matplotlib.pyplot as plt
 
 import config
+from simulation.track.config import t_end
 from simulation.track.eom import eval_eom_ode
 from simulation.track.excitations import time_excitations
 from simulation.track.model_params import Params
@@ -23,6 +24,9 @@ def plot():
         step_sizes.append(rk45.step_size)
         t_eval.append(rk45.t)
         y.append(rk45.y)
+
+    # number of rejected steps is not directly available
+    print(len(t_eval), rk45.nfev)
 
     y = np.array(y)
     step_sizes = np.array(step_sizes)
