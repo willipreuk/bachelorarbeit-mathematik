@@ -3,7 +3,6 @@ import scipy as sp
 import matplotlib.pyplot as plt
 
 import config
-from simulation.track.config import t_end
 from simulation.track.eom import eval_eom_ode
 from simulation.track.excitations import time_excitations
 from simulation.track.model_params import Params
@@ -50,7 +49,7 @@ def plot():
 
 
 if __name__ == '__main__':
-    config.excitation = config.Excitations.SIMULATED_SPLINE
+    config.excitation = config.Excitations.DATA_SPLINE
     plot()
     config.excitation = config.Excitations.SIMULATED_NEURAL_NETWORK
     plot()

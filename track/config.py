@@ -20,13 +20,13 @@ def get_model_path():
     return "keras-models/" + str(error_weight) + "_" + str(first_diff_weight) + "_" + data_source.value + ".model.keras"
 
 excitation = Excitations.SIMULATED_NEURAL_NETWORK
-data_source = TrainData.SIMULATED
+data_source = TrainData.DATA
 
 t_end = 10
 delta_t = 0.025
 delta_t_simulation = delta_t / 10
 
-batch_size = 48
+batch_size = 480
 epochs = 1000
 
 data_r_path = "data/Hhwayre.dat"

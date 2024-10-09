@@ -7,9 +7,9 @@ from simulation.track.data import read_data, simulated_excitation, simulated_dif
 
 _data_l, _data_r, _x_vals = read_data()
 _spline_l = sp.interpolate.CubicSpline(_x_vals, _data_l)
-_spline_r = sp.interpolate.CubicSpline(_x_vals, _data_r)
+_spline_r = sp.interpolate.CubicSpline(_x_vals, _data_l)
 
-_fine_x_vals = np.arange(0, config.t_end, config.delta_t_simulation / 2)
+_fine_x_vals = np.arange(0, config.t_end, config.delta_t)
 _predicted = predict(_fine_x_vals).flatten()
 _nn_spline = sp.interpolate.CubicSpline(_fine_x_vals, _predicted)
 

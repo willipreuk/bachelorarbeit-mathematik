@@ -1,8 +1,9 @@
+import numpy as np
 from matplotlib import pyplot as plt
 from sklearn.model_selection import train_test_split
 
 from data import read_data
-from keras import layers, Input, Sequential, callbacks, models, optimizers, ops, losses, saving
+from keras import layers, Input, Sequential, callbacks, models, optimizers, ops, losses
 import tensorflow as tf
 import os
 import config
@@ -48,6 +49,8 @@ def _load_model():
             layers.LeakyReLU(),
             layers.Dense(512),
             layers.LeakyReLU(),
+            layers.Dense(512),
+            layers.LeakyReLU(),
             layers.Dense(1, activation='linear'),
         ])
 
@@ -66,6 +69,11 @@ def train_nn():
 
     model = _load_model()
     data, data_l, x_vals = read_data()
+
+    x_vals_fine = np.arange(0, config.t_end, config.delta_t_simulation / 10)
+    data_fine = np.interp(x_vals_fine, x_vals, data)
+    x_vals = x_vals_fine
+    data = data_fine
 
     print("Data shape: ", data.shape)
     print("x_vals shape: ", x_vals.shape)
