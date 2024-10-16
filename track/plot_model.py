@@ -6,6 +6,7 @@ import config
 from simulation.track.eom import eval_eom_ode
 from simulation.track.excitations import time_excitations
 from simulation.track.model_params import Params
+from simulation.track.data import read_data
 
 
 def plot():
@@ -48,9 +49,22 @@ def plot():
     plt.legend()
 
 
+def plot_data():
+    data_l, data_r, x_vals = read_data()
+
+    plt.figure()
+
+    plt.plot(x_vals, data_l, "C1", label="Left", alpha=1)
+    plt.plot(x_vals, data_r, "C2", label="Right", alpha=1)
+    plt.plot(x_vals, data_r, "xC2", alpha=0.3)
+    plt.plot(x_vals, data_l, "xC1", alpha=0.3)
+
+    plt.xlabel("Time")
+    plt.ylabel("Amplitude")
+    plt.legend()
+    plt.title("Data")
+
+
 if __name__ == '__main__':
-    config.excitation = config.Excitations.DATA_SPLINE
-    plot()
-    config.excitation = config.Excitations.SIMULATED_NEURAL_NETWORK
-    plot()
-    plt.show()
+    plot_data()
+    plt.savefig("real_data_plot.pdf")
