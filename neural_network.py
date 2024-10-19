@@ -16,9 +16,9 @@ def _custom_loss(y_true, y_pred):
     first_diff = ops.mean(ops.square(ops.diff(y_pred, axis=0)))
     second_diff = ops.mean(ops.square(ops.diff(y_pred, n=2, axis=0)))
 
-    return (config.error_weight * error
-            + (1 - config.error_weight) * config.first_diff_weight * first_diff
-            + (1 - config.error_weight) * (1 - config.first_diff_weight) * second_diff)
+    return (error
+            + config.first_diff_weigth * first_diff
+            + config.second_diff_weigth * second_diff)
 
 
 def _load_model():
@@ -44,8 +44,6 @@ def _load_model():
             layers.Dense(128),
             layers.LeakyReLU(),
             layers.Dense(256),
-            layers.LeakyReLU(),
-            layers.Dense(512),
             layers.LeakyReLU(),
             layers.Dense(512),
             layers.LeakyReLU(),

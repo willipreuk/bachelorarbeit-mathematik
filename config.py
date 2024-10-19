@@ -14,10 +14,10 @@ class Excitations(Enum):
 
 
 
-error_weight = 1
-first_diff_weight = 1
+first_diff_weigth = 0
+second_diff_weigth = 0
 def get_model_path():
-    return "keras-models/" + str(error_weight) + "_" + str(first_diff_weight) + "_" + data_source.value + ".model.keras"
+    return "keras-models/" + str(first_diff_weigth) + "_" + str(second_diff_weigth) + "_" + data_source.value + ".model.keras"
 
 excitation = Excitations.SIMULATED_NEURAL_NETWORK
 data_source = TrainData.DATA
@@ -26,8 +26,8 @@ t_end = 10
 delta_t = 0.025
 delta_t_simulation = delta_t / 10
 
-batch_size = 480
-epochs = 1000
+batch_size = 400
+epochs = 2000
 
 data_r_path = "data/Hhwayre.dat"
 data_l_path = "data/Hhwayli.dat"
