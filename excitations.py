@@ -3,7 +3,7 @@ import scipy as sp
 
 import config
 from neural_network import predict
-from simulation.track.data import read_data, simulated_excitation, simulated_diff_excitation
+from simulation.data import read_data, simulated_excitation, simulated_diff_excitation
 
 _data_l, _data_r, _x_vals = read_data()
 _spline_l = sp.interpolate.CubicSpline(_x_vals, _data_l)
