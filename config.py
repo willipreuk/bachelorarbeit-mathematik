@@ -20,7 +20,7 @@ def get_model_path():
     return "keras-models/" + str(first_diff_weigth) + "_" + str(second_diff_weigth) + "_" + data_source.value + ".model.keras"
 
 excitation = Excitations.SIMULATED_NEURAL_NETWORK
-data_source = TrainData.DATA
+data_source = TrainData.SIMULATED
 
 t_end = 10
 delta_t = 0.025

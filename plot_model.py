@@ -8,8 +8,7 @@ from simulation.excitations import time_excitations
 from simulation.model_params import Params
 from simulation.data import read_data
 
-
-def plot():
+def sol():
     q_ini = Params.q_0
     q_0 = np.zeros(2 * Params.nq)
     q_0[0:4] = q_ini
@@ -34,18 +33,61 @@ def plot():
 
     y = np.transpose(y)
 
-    plt.figure()
-    plt.title("step sizes and excitations (" + config.excitation.value + ")")
-    plt.plot(t_eval, step_sizes, label="h")
+    return t_eval, step_sizes, y
 
-    plt.plot(t_eval, time_excitations(t_eval)[0], label="left")
-    plt.plot(t_eval, time_excitations(t_eval)[1], label="right")
+
+def plot_comparison_step_sizes():
+    plt.figure(figsize=(10,5))
+
+    config.excitation = config.Excitations.SIMULATED_NEURAL_NETWORK
+    config.first_diff_weigth = 0
+    config.second_diff_weigth = 0
+
+    t_eval, step_sizes, y = sol()
+
+    plt.plot(t_eval, step_sizes, label="Step size (NN)")
+    plt.plot(t_eval, time_excitations(t_eval)[0], label="Excitation (NN)")
+
+    config.excitation = config.Excitations.SIMULATED_SPLINE
+    config.first_diff_weigth = 0
+    config.second_diff_weigth = 0
+
+    t_eval, step_sizes, y = sol()
+
+    plt.plot(t_eval, step_sizes, label="Step size (reference)")
+    plt.plot(t_eval, time_excitations(t_eval)[0],"--", label="Excitation (reference)")
+
+
+    plt.xlabel("Time")
     plt.legend()
+    # plt.figure()
+    # plt.title("States (" + config.excitation.value + ")")
+    # plt.plot(t_eval, y[0], label="z_a")
+    # plt.plot(t_eval, y[1], label="z_s")
+    # plt.legend()
 
-    plt.figure()
-    plt.title("States (" + config.excitation.value + ")")
-    plt.plot(t_eval, y[0], label="z_a")
-    plt.plot(t_eval, y[1], label="z_s")
+def plot_sol_comparison():
+    plt.figure(figsize=(10,5))
+
+    config.excitation = config.Excitations.SIMULATED_NEURAL_NETWORK
+    config.first_diff_weigth = 0
+    config.second_diff_weigth = 0
+
+    t_eval, step_sizes, y = sol()
+
+    plt.plot(t_eval, y[0], label="$z_a$ (NN)")
+    plt.plot(t_eval, y[1], label="$z_s$ (NN)")
+
+    config.excitation = config.Excitations.SIMULATED_SPLINE
+    config.first_diff_weigth = 0
+    config.second_diff_weigth = 0
+
+    t_eval, step_sizes, y = sol()
+
+    plt.plot(t_eval, y[0], "--", label="$z_a$ (reference)")
+    plt.plot(t_eval, y[1], "--", label="$z_s$ (reference)")
+
+    plt.xlabel("Time")
     plt.legend()
 
 
@@ -65,5 +107,5 @@ def plot_data():
 
 
 if __name__ == '__main__':
-    plot_data()
-    plt.savefig("plots/real_data_plot.pdf")
+    plot_comparison_step_sizes()
+    plt.savefig("plot/excitation-simulated-h-comparison.pdf")
