@@ -75,13 +75,13 @@ def plot_comparison_nn_spline_delta_t():
 
     t_eval, step_sizes, y = sol()
 
-    plt.plot(t_eval, step_sizes, label=r"Step size ($\Delta x = 0.025$)")
+    plt.plot(t_eval, step_sizes, label=r"$\Delta x = 0.025$")
 
     config.neural_network_predict_delta_t = config.delta_t / 10
 
     t_eval, step_sizes, y = sol()
 
-    plt.plot(t_eval, step_sizes, label="Step size ($\Delta x = 0.0025$)")
+    plt.plot(t_eval, step_sizes, label="$\Delta x = 0.0025$")
 
 
     plt.xlabel("Time")
@@ -146,16 +146,41 @@ def plot_sol_dif_comparison():
 
     t_eval, step_sizes, y = sol()
 
-    plt.plot(t_eval, y[0], label="$z_a$ (NN)")
-    plt.plot(t_eval, y[1], label="$z_s$ (NN)")
+    plt.plot(t_eval, y[0], label=r"$z_a$ (NN $\alpha = 0$)")
+    plt.plot(t_eval, y[1], label=r"$z_s$ (NN $\alpha = 0$)")
 
     config.first_diff_weigth = 0.01
     config.second_diff_weigth = 0
 
     t_eval, step_sizes, y = sol()
 
-    plt.plot(t_eval, y[0], "--", label=r"$z_a$ (NN $\alpha = 0.01$)")
-    plt.plot(t_eval, y[1], "--", label=r"$z_s$ (NN $\alpha = 0.01$)")
+    plt.plot(t_eval, y[0], label=r"$z_a$ (NN $\alpha = 0.01$)")
+    plt.plot(t_eval, y[1], label=r"$z_s$ (NN $\alpha = 0.01$)")
+
+    config.first_diff_weigth = 0.1
+    config.second_diff_weigth = 0
+
+    t_eval, step_sizes, y = sol()
+
+    plt.plot(t_eval, y[0], label=r"$z_a$ (NN $\alpha = 0.1$)")
+    plt.plot(t_eval, y[1], label=r"$z_s$ (NN $\alpha = 0.1$)")
+
+    config.first_diff_weigth = 0.25
+    config.second_diff_weigth = 0
+
+    t_eval, step_sizes, y = sol()
+
+    plt.plot(t_eval, y[0], label=r"$z_a$ (NN $\alpha = 0.25$)")
+    plt.plot(t_eval, y[1], label=r"$z_s$ (NN $\alpha = 0.25$)")
+
+    config.excitation = config.Excitations.SIMULATED_SPLINE
+    config.first_diff_weigth = 0
+    config.second_diff_weigth = 0
+
+    t_eval, step_sizes, y = sol()
+
+    plt.plot(t_eval, y[0], "--", label="$z_a$ (reference)")
+    plt.plot(t_eval, y[1], "--", label="$z_s$ (reference)")
 
     plt.xlabel("Time")
     plt.legend()
@@ -177,4 +202,4 @@ def plot_data():
 
 if __name__ == '__main__':
     plot_comparison_nn_spline_delta_t()
-    plt.savefig("plot/nn-step-size-spline-delta-x.pdf")
+    plt.savefig("plot/plot_comparison_nn_spline_delta_t.pdf")
