@@ -31,3 +31,5 @@ epochs = 2000
 
 data_r_path = "data/Hhwayre.dat"
 data_l_path = "data/Hhwayli.dat"
+
+neural_network_predict_delta_t = delta_t

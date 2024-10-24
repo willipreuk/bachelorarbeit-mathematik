@@ -8,6 +8,8 @@ from simulation.excitations import time_excitations
 from simulation.model_params import Params
 from simulation.data import read_data
 
+# These functions are used to plot the figures in the thesis.
+
 def sol():
     q_ini = Params.q_0
     q_0 = np.zeros(2 * Params.nq)
@@ -60,11 +62,55 @@ def plot_comparison_step_sizes():
 
     plt.xlabel("Time")
     plt.legend()
-    # plt.figure()
-    # plt.title("States (" + config.excitation.value + ")")
-    # plt.plot(t_eval, y[0], label="z_a")
-    # plt.plot(t_eval, y[1], label="z_s")
-    # plt.legend()
+
+
+def plot_comparison_nn_spline_delta_t():
+    plt.figure(figsize=(10,5))
+
+    config.excitation = config.Excitations.SIMULATED_NEURAL_NETWORK
+    config.first_diff_weigth = 0
+    config.second_diff_weigth = 0
+
+    config.neural_network_predict_delta_t = config.delta_t
+
+    t_eval, step_sizes, y = sol()
+
+    plt.plot(t_eval, step_sizes, label=r"Step size ($\Delta x = 0.025$)")
+
+    config.neural_network_predict_delta_t = config.delta_t / 10
+
+    t_eval, step_sizes, y = sol()
+
+    plt.plot(t_eval, step_sizes, label="Step size ($\Delta x = 0.0025$)")
+
+
+    plt.xlabel("Time")
+    plt.legend()
+
+
+def plot_comparison_nn_step_sizes():
+    plt.figure(figsize=(10,5))
+
+    config.excitation = config.Excitations.SIMULATED_NEURAL_NETWORK
+    config.first_diff_weigth = 0
+    config.second_diff_weigth = 0
+
+    t_eval, step_sizes, y = sol()
+
+    plt.plot(t_eval, step_sizes, label=r"Step size (NN)")
+    plt.plot(t_eval, time_excitations(t_eval)[0], label=r"Excitation (NN)")
+
+    config.first_diff_weigth = 0.01
+    config.second_diff_weigth = 0
+
+    t_eval, step_sizes, y = sol()
+
+    plt.plot(t_eval, step_sizes, label=r"Step size (NN $\alpha = 0.01$)")
+    plt.plot(t_eval, time_excitations(t_eval)[0],"--", label=r"Excitation (NN $\alpha = 0.01$)")
+
+
+    plt.xlabel("Time")
+    plt.legend()
 
 def plot_sol_comparison():
     plt.figure(figsize=(10,5))
@@ -91,6 +137,29 @@ def plot_sol_comparison():
     plt.legend()
 
 
+def plot_sol_dif_comparison():
+    plt.figure(figsize=(10,5))
+
+    config.excitation = config.Excitations.SIMULATED_NEURAL_NETWORK
+    config.first_diff_weigth = 0
+    config.second_diff_weigth = 0
+
+    t_eval, step_sizes, y = sol()
+
+    plt.plot(t_eval, y[0], label="$z_a$ (NN)")
+    plt.plot(t_eval, y[1], label="$z_s$ (NN)")
+
+    config.first_diff_weigth = 0.01
+    config.second_diff_weigth = 0
+
+    t_eval, step_sizes, y = sol()
+
+    plt.plot(t_eval, y[0], "--", label=r"$z_a$ (NN $\alpha = 0.01$)")
+    plt.plot(t_eval, y[1], "--", label=r"$z_s$ (NN $\alpha = 0.01$)")
+
+    plt.xlabel("Time")
+    plt.legend()
+
 def plot_data():
     data_l, data_r, x_vals = read_data()
 
@@ -107,5 +176,5 @@ def plot_data():
 
 
 if __name__ == '__main__':
-    plot_comparison_step_sizes()
-    plt.savefig("plot/excitation-simulated-h-comparison.pdf")
+    plot_comparison_nn_spline_delta_t()
+    plt.savefig("plot/nn-step-size-spline-delta-x.pdf")
