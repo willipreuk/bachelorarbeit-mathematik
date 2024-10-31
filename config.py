@@ -11,6 +11,7 @@ class Excitations(Enum):
     SIMULATED_NEURAL_NETWORK = "simulated neural network excitations"
     DATA_SPLINE = "data spline excitations"
     DATA_NEURAL_NETWORK = "data neural network excitations"
+    SIMULATED_NEURAL_NETWORK_PREDICT = "simulated neural network excitations prediction"
 
 
 

@@ -21,7 +21,7 @@ def _custom_loss(y_true, y_pred):
             + config.second_diff_weigth * second_diff)
 
 
-def _load_model():
+def load_model():
     model_path = config.get_model_path()
 
     if os.path.exists(model_path):
@@ -65,7 +65,7 @@ def _load_model():
 def train_nn():
     model_path = config.get_model_path()
 
-    model = _load_model()
+    model = load_model()
     data, data_l, x_vals = read_data()
 
     x_vals_fine = np.arange(0, config.t_end, config.delta_t_simulation / 10)
@@ -109,5 +109,5 @@ def train_nn():
 
 
 def predict(t):
-    model = _load_model()
+    model = load_model()
     return model.predict(t, verbose=0)
