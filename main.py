@@ -27,10 +27,11 @@ if __name__ == '__main__':
     # real data
     data, _, x_vals = read_data()
 
-    # config.first_diff_weigth = 0
-    # train_nn()
-    # config.first_diff_weigth = 0.01
-    # train_nn()
+    config.second_diff_weigth = 0
+    config.first_diff_weigth = 0
+    train_nn()
+    config.first_diff_weigth = 0.01
+    train_nn()
     config.first_diff_weigth = 0.1
     train_nn()
     config.first_diff_weigth = 0.25

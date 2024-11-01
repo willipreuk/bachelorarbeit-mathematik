@@ -68,7 +68,7 @@ def train_nn():
     model = load_model()
     data, data_l, x_vals = read_data()
 
-    x_vals_fine = np.arange(0, config.t_end, config.delta_t_simulation / 10)
+    x_vals_fine = np.arange(0, config.t_end + 3 * config.phase_shift, config.delta_t_simulation / 10)
     data_fine = np.interp(x_vals_fine, x_vals, data)
     x_vals = x_vals_fine
     data = data_fine

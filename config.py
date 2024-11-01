@@ -23,12 +23,12 @@ def get_model_path():
 excitation = Excitations.SIMULATED_NEURAL_NETWORK
 data_source = TrainData.SIMULATED
 
-t_end = 10
+t_end = 3
 delta_t = 0.025
 delta_t_simulation = delta_t / 10
 
 batch_size = 400
-epochs = 2000
+epochs = 3000
 
 data_r_path = "data/Hhwayre.dat"
 data_l_path = "data/Hhwayli.dat"

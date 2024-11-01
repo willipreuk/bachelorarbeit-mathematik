@@ -47,7 +47,7 @@ def read_data():
     :return: tuple of left and right track data and time values
     """
 
-    x_vals = np.arange(0, config.t_end, config.delta_t)
+    x_vals = np.arange(0, config.t_end + 2 * config.phase_shift, config.delta_t)
 
     if config.data_source == config.TrainData.DATA:
         with open(config.data_r_path, "r") as file:
@@ -63,7 +63,7 @@ def read_data():
         data_l = np.array(data_l[:len(x_vals)])
 
     else:
-        x_vals = np.arange(0, config.t_end, config.delta_t_simulation)
+        x_vals = np.arange(0, config.t_end + 2 * config.phase_shift, config.delta_t_simulation)
         data_l, data_r = simulated_excitation(x_vals)
 
     return data_l, data_r, x_vals

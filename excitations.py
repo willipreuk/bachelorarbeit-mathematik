@@ -46,7 +46,7 @@ def time_excitations(t):
 
         left_diff, right_diff = simulated_diff_excitation(t)
 
-        return left, left, left_diff, right_diff
+        return left, right, left_diff, right_diff
 
     if config.excitation == config.Excitations.SIMULATED_NEURAL_NETWORK_PREDICT:
         if (model is None) or (config.first_diff_weigth, config.second_diff_weigth) != (
@@ -54,6 +54,9 @@ def time_excitations(t):
             model = load_model()
             last_first_dif_weight = config.first_diff_weigth
             last_second_dif_wight = config.second_diff_weigth
+
+
+        print("t: ", t)
 
         x_left = np.array([t])
         x_right = x_left + config.phase_shift
