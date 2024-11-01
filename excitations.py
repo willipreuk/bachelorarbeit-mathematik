@@ -41,11 +41,12 @@ def time_excitations(t):
 
         return _nn_spline(t), _nn_spline(t), _nn_spline(t, 1), _nn_spline(t, 1)
 
-    if config.excitation == config.Excitations.SIMULATED_SPLINE:
+    if config.excitation == config.Excitations.SIMULATED:
         left, right = simulated_excitation(t)
+
         left_diff, right_diff = simulated_diff_excitation(t)
 
-        return left, right, left_diff, right_diff
+        return left, left, left_diff, right_diff
 
     if config.excitation == config.Excitations.SIMULATED_NEURAL_NETWORK_PREDICT:
         if (model is None) or (config.first_diff_weigth, config.second_diff_weigth) != (
@@ -54,7 +55,12 @@ def time_excitations(t):
             last_first_dif_weight = config.first_diff_weigth
             last_second_dif_wight = config.second_diff_weigth
 
-        left = model.predict(np.array([t]), verbose=0)[0][0]
-        left_dif = approx_fprime(np.array([t]), lambda x: model.predict(x, verbose=0)[0], epsilon=1e-6)[0]
+        x_left = np.array([t])
+        x_right = x_left + config.phase_shift
 
-        return left, left, left_dif, left_dif
+        left = model.predict(x_left, verbose=0)[0][0]
+        right = model.predict(x_right, verbose=0)[0][0]
+        left_dif = approx_fprime(x_left, lambda x: model.predict(x, verbose=0)[0], epsilon=1e-6)[0]
+        right_dif = approx_fprime(x_right, lambda x: model.predict(x, verbose=0)[0], epsilon=1e-6)[0]
+
+        return left, right, left_dif, right_dif

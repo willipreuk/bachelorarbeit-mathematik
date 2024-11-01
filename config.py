@@ -7,7 +7,7 @@ class TrainData(Enum):
 
 
 class Excitations(Enum):
-    SIMULATED_SPLINE = "simulated excitations"
+    SIMULATED = "simulated excitations"
     SIMULATED_NEURAL_NETWORK = "simulated neural network excitations"
     DATA_SPLINE = "data spline excitations"
     DATA_NEURAL_NETWORK = "data neural network excitations"
@@ -32,5 +32,6 @@ epochs = 2000
 
 data_r_path = "data/Hhwayre.dat"
 data_l_path = "data/Hhwayli.dat"
+phase_shift = 0.4
 
 neural_network_predict_delta_t = delta_t

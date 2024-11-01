@@ -14,10 +14,10 @@ def simulated_excitation(t):
     # data_l = 0.1 * np.sin(2 * np.pi * (t + 0.4))
     # data_r = 0.1 * np.sin(2 * np.pi * (t + 0.1))
 
-    data_l = 0.01 * (np.sin(0.2 * np.pi * t) + np.sin(0.4 * np.pi * t) + np.sin(0.75 * np.pi * t) + np.sin(1 * np.pi * t) + np.sin(1.5 * np.pi * t))
-    data_r = 0.01 * (np.sin(0.2 * np.pi * t + 0.4) + np.sin(0.4 * np.pi * t) + np.sin(0.75 * np.pi * t) + np.sin(1 * np.pi * t) + np.sin(1.5 * np.pi * t))
+    def f(x):
+        return 0.01 * (np.sin(0.2 * np.pi * x) + np.sin(0.4 * np.pi * x) + np.sin(0.75 * np.pi * x) + np.sin(1 * np.pi * x) + np.sin(1.5 * np.pi * x))
 
-    return data_l, data_r
+    return f(t), f(t + config.phase_shift)
 
 
 def simulated_diff_excitation(t):
@@ -31,19 +31,14 @@ def simulated_diff_excitation(t):
     # data_l_diff = 0.1 * np.cos(2 * np.pi * (t + 0.4)) * 2 * np.pi
     # data_r_diff = 0.1 * np.cos(2 * np.pi * (t + 0.1)) * 2 * np.pi
 
-    data_l_diff = 0.01 * (0.2 * np.pi * np.cos(0.2 * np.pi * t)
-                          + 0.4 * np.pi * np.cos(0.4 * np.pi * t)
-                          + 0.75 * np.pi * np.cos(0.75 * np.pi * t)
-                          + 1 * np.pi * np.cos(1 * np.pi * t)
-                          + 1.5 * np.pi * np.cos(1.5 * np.pi * t))
+    def f_prime(x):
+        return 0.01 * (0.2 * np.pi * np.cos(0.2 * np.pi * t)
+                       + 0.4 * np.pi * np.cos(0.4 * np.pi * t)
+                       + 0.75 * np.pi * np.cos(0.75 * np.pi * t)
+                       + 1 * np.pi * np.cos(1 * np.pi * t)
+                       + 1.5 * np.pi * np.cos(1.5 * np.pi * t))
 
-    data_r_diff = 0.01 * (0.2 * np.pi * np.cos(0.2 * np.pi * t + 0.4)
-                          + 0.4 * np.pi * np.cos(0.4 * np.pi * t)
-                          + 0.75 * np.pi * np.cos(0.75 * np.pi * t)
-                          + 1 * np.pi * np.cos(1 * np.pi * t)
-                          + 1.5 * np.pi * np.cos(1.5 * np.pi * t))
-
-    return data_l_diff, data_r_diff
+    return f_prime(t), f_prime(t + config.phase_shift)
 
 
 def read_data():
@@ -119,6 +114,5 @@ def _plot_freq():
 
 if __name__ == '__main__':
     _plot_data()
-    _plot_freq()
 
     plt.show()

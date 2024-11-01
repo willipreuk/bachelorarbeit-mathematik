@@ -59,7 +59,7 @@ def plot_comparison_step_sizes():
     plt.plot(step_sizes_t, step_sizes, label="Step size (NN)")
     plt.plot(step_sizes_t, time_excitations(step_sizes_t)[0], label="Excitation (NN)")
 
-    config.excitation = config.Excitations.SIMULATED_SPLINE
+    config.excitation = config.Excitations.SIMULATED
     config.first_diff_weigth = 0
     config.second_diff_weigth = 0
 
@@ -131,7 +131,7 @@ def plot_sol_comparison():
     plt.plot(t_eval, y[0], label="$z_a$ (NN)")
     plt.plot(t_eval, y[1], label="$z_s$ (NN)")
 
-    config.excitation = config.Excitations.SIMULATED_SPLINE
+    config.excitation = config.Excitations.SIMULATED
     config.first_diff_weigth = 0
     config.second_diff_weigth = 0
 
@@ -180,7 +180,7 @@ def plot_sol_dif_comparison():
     plt.plot(t_eval, y[0], label=r"$z_a$ (NN $\alpha = 0.25$)")
     plt.plot(t_eval, y[1], label=r"$z_s$ (NN $\alpha = 0.25$)")
 
-    config.excitation = config.Excitations.SIMULATED_SPLINE
+    config.excitation = config.Excitations.SIMULATED
     config.first_diff_weigth = 0
     config.second_diff_weigth = 0
 
@@ -196,7 +196,7 @@ def plot_sol_dif_comparison():
 def plot_sol_ref_predicted():
     plt.figure(figsize=(10, 5))
 
-    config.excitation = config.Excitations.SIMULATED_SPLINE
+    config.excitation = config.Excitations.SIMULATED
     config.first_diff_weigth = 0
     config.second_diff_weigth = 0
 
@@ -253,4 +253,4 @@ def plot_data():
 
 if __name__ == '__main__':
     plot_sol_ref_predicted()
-    plt.savefig("plot/plot_sol_ref_predicted_2.pdf")
+    plt.savefig("plot/plot_sol_compare.pdf")
