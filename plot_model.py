@@ -26,6 +26,7 @@ def custom_sol_ivp(*args, **kwargs):
         def step(self):
             super().step()
             step_sizes.append(self.step_size)
+            print("Step size: ", self.step_size)
             step_sizes_t.append(self.t)
 
     solution = sp.integrate.solve_ivp(*args, **kwargs, method=Solver)
@@ -35,7 +36,7 @@ def custom_sol_ivp(*args, **kwargs):
 
 def constant_sol_ivp(step_size, *args, **kwargs):
     # Turn of error checking by setting rather high tolerances
-    return custom_sol_ivp(*args, **kwargs, a_tol=10, r_tol=10, max_step=step_size)
+    return custom_sol_ivp(*args, **kwargs, a_tol=1e10, r_tol=1e10, max_step=step_size, min_step=step_size)
 
 
 def ref_sol():
@@ -71,7 +72,7 @@ def sol_constant_step_size(step_size):
 
     t_eval = np.linspace(0, config.t_end, 1000)
 
-    solution, step_sizes_t, step_sizes = constant_sol_ivp(step_size, eval_eom_ode, (0, config.t_end), q_0, atol=1e-6, rtol=1e-3, t_eval=t_eval)
+    solution, step_sizes_t, step_sizes = constant_sol_ivp(step_size, eval_eom_ode, (0, config.t_end), q_0, t_eval=t_eval)
 
     return t_eval, solution.y, step_sizes_t, step_sizes
 
@@ -290,7 +291,7 @@ def plot_constant_step_size_error():
 
     t_eval, y_ref, _, _ = ref_sol()
 
-    step_sizes = np.linspace(0.0001, 1, 10)
+    step_sizes = np.linspace(0.001, 1, 10)
 
     config.excitation = config.Excitations.SIMULATED_NEURAL_NETWORK_PREDICT
     errors = []
@@ -322,5 +323,5 @@ def plot_data():
 
 
 if __name__ == '__main__':
-    plot_sol_comparison()
+    plot_constant_step_size_error()
     plt.savefig("plot/plot_constant_step_size_error_nn.pdf")
