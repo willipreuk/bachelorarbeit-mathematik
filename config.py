@@ -15,10 +15,10 @@ class Excitations(Enum):
 
 
 
-first_diff_weigth = 0
-second_diff_weigth = 0
+first_diff_weight = 0
+second_diff_weight = 0
 def get_model_path():
-    return "keras-models/" + str(first_diff_weigth) + "_" + str(second_diff_weigth) + "_" + data_source.value + ".model.keras"
+    return "keras-models/" + str(first_diff_weight) + "_" + str(second_diff_weight) + "_" + data_source.value + ".model.keras"
 
 excitation = Excitations.SIMULATED_NEURAL_NETWORK
 data_source = TrainData.SIMULATED

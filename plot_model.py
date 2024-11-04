@@ -83,8 +83,8 @@ def plot_comparison_step_sizes():
     plt.figure(figsize=(10, 5))
 
     config.excitation = config.Excitations.SIMULATED_NEURAL_NETWORK
-    config.first_diff_weigth = 0
-    config.second_diff_weigth = 0
+    config.first_diff_weight = 0
+    config.second_diff_weight = 0
 
     _, _, step_sizes_t, step_sizes = sol()
 
@@ -92,8 +92,8 @@ def plot_comparison_step_sizes():
     plt.plot(step_sizes_t, time_excitations(step_sizes_t)[0], label="Excitation (NN)")
 
     config.excitation = config.Excitations.SIMULATED
-    config.first_diff_weigth = 0
-    config.second_diff_weigth = 0
+    config.first_diff_weight = 0
+    config.second_diff_weight = 0
 
     _, _, step_sizes_t, step_sizes = sol()
 
@@ -108,8 +108,8 @@ def plot_comparison_nn_spline_delta_t():
     plt.figure(figsize=(10, 5))
 
     config.excitation = config.Excitations.SIMULATED_NEURAL_NETWORK
-    config.first_diff_weigth = 0
-    config.second_diff_weigth = 0
+    config.first_diff_weight = 0
+    config.second_diff_weight = 0
 
     config.neural_network_predict_delta_t = config.delta_t
 
@@ -131,16 +131,16 @@ def plot_comparison_nn_step_sizes():
     plt.figure(figsize=(10, 5))
 
     config.excitation = config.Excitations.SIMULATED_NEURAL_NETWORK
-    config.first_diff_weigth = 0
-    config.second_diff_weigth = 0
+    config.first_diff_weight = 0
+    config.second_diff_weight = 0
 
     _, _, step_sizes_t, step_sizes = sol()
 
     plt.plot(step_sizes_t, step_sizes, label=r"Step size (NN)")
     plt.plot(step_sizes_t, time_excitations(step_sizes_t)[0], label=r"Excitation (NN)")
 
-    config.first_diff_weigth = 0.01
-    config.second_diff_weigth = 0
+    config.first_diff_weight = 0.01
+    config.second_diff_weight = 0
 
     _, _, step_sizes_t, step_sizes = sol()
 
@@ -155,8 +155,8 @@ def plot_sol_comparison():
     plt.figure(figsize=(10, 5))
 
     config.excitation = config.Excitations.SIMULATED_NEURAL_NETWORK_PREDICT
-    config.first_diff_weigth = 0
-    config.second_diff_weigth = 0
+    config.first_diff_weight = 0
+    config.second_diff_weight = 0
 
     t_eval, y, _, _ = sol()
 
@@ -164,8 +164,8 @@ def plot_sol_comparison():
     plt.plot(t_eval, y[1], label="$z_s$ (NN)")
 
     config.excitation = config.Excitations.SIMULATED
-    config.first_diff_weigth = 0
-    config.second_diff_weigth = 0
+    config.first_diff_weight = 0
+    config.second_diff_weight = 0
 
     t_eval, y, _, _ = sol()
 
@@ -180,32 +180,32 @@ def plot_sol_dif_comparison():
     plt.figure(figsize=(10, 5))
 
     config.excitation = config.Excitations.SIMULATED_NEURAL_NETWORK
-    config.first_diff_weigth = 0
-    config.second_diff_weigth = 0
+    config.first_diff_weight = 0
+    config.second_diff_weight = 0
 
     t_eval, y, _, _ = sol()
 
     plt.plot(t_eval, y[0], label=r"$z_a$ (NN $\alpha = 0$)")
     plt.plot(t_eval, y[1], label=r"$z_s$ (NN $\alpha = 0$)")
 
-    config.first_diff_weigth = 0.01
-    config.second_diff_weigth = 0
+    config.first_diff_weight = 0.01
+    config.second_diff_weight = 0
 
     t_eval, y, _, _ = sol()
 
     plt.plot(t_eval, y[0], label=r"$z_a$ (NN $\alpha = 0.01$)")
     plt.plot(t_eval, y[1], label=r"$z_s$ (NN $\alpha = 0.01$)")
 
-    config.first_diff_weigth = 0.1
-    config.second_diff_weigth = 0
+    config.first_diff_weight = 0.1
+    config.second_diff_weight = 0
 
     t_eval, y, _, _ = sol()
 
     plt.plot(t_eval, y[0], label=r"$z_a$ (NN $\alpha = 0.1$)")
     plt.plot(t_eval, y[1], label=r"$z_s$ (NN $\alpha = 0.1$)")
 
-    config.first_diff_weigth = 0.25
-    config.second_diff_weigth = 0
+    config.first_diff_weight = 0.25
+    config.second_diff_weight = 0
 
     t_eval, y, _, _ = sol()
 
@@ -213,8 +213,8 @@ def plot_sol_dif_comparison():
     plt.plot(t_eval, y[1], label=r"$z_s$ (NN $\alpha = 0.25$)")
 
     config.excitation = config.Excitations.SIMULATED
-    config.first_diff_weigth = 0
-    config.second_diff_weigth = 0
+    config.first_diff_weight = 0
+    config.second_diff_weight = 0
 
     t_eval, y, _, _ = sol()
 
@@ -229,8 +229,8 @@ def plot_sol_ref_predicted():
     plt.figure(figsize=(10, 5))
 
     config.excitation = config.Excitations.SIMULATED
-    config.first_diff_weigth = 0
-    config.second_diff_weigth = 0
+    config.first_diff_weight = 0
+    config.second_diff_weight = 0
 
     t_eval, y_ref, _, _ = sol()
 
@@ -238,8 +238,8 @@ def plot_sol_ref_predicted():
     plt.plot(t_eval, y_ref[1], label=r"$z_s$ (ref)")
 
     config.excitation = config.Excitations.SIMULATED_NEURAL_NETWORK_PREDICT
-    config.first_diff_weigth = 0
-    config.second_diff_weigth = 0
+    config.first_diff_weight = 0
+    config.second_diff_weight = 0
 
     t_eval, y, _, _ = sol()
 
@@ -252,8 +252,8 @@ def plot_sol_ref_predicted():
 
 
     config.excitation = config.Excitations.SIMULATED_NEURAL_NETWORK_PREDICT
-    config.first_diff_weigth = 0.01
-    config.second_diff_weigth = 0
+    config.first_diff_weight = 0.01
+    config.second_diff_weight = 0
 
     t_eval, y, _, _ = sol()
 
@@ -265,8 +265,8 @@ def plot_sol_ref_predicted():
     print("Max diff z_s: ", np.max(np.abs(y_ref[1] - y[1])))
 
     config.excitation = config.Excitations.SIMULATED_NEURAL_NETWORK_PREDICT
-    config.first_diff_weigth = 0.1
-    config.second_diff_weigth = 0
+    config.first_diff_weight = 0.1
+    config.second_diff_weight = 0
 
     t_eval, y, _, _ = sol()
 
@@ -286,8 +286,8 @@ def plot_constant_step_size_error():
     plt.figure(figsize=(5, 5))
 
     config.excitation = config.Excitations.SIMULATED
-    config.first_diff_weigth = 0
-    config.second_diff_weigth = 0
+    config.first_diff_weight = 0
+    config.second_diff_weight = 0
 
     t_eval, y_ref, _, _ = ref_sol()
 

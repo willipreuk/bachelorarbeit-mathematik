@@ -17,8 +17,8 @@ def _custom_loss(y_true, y_pred):
     second_diff = ops.mean(ops.square(ops.diff(y_pred, n=2, axis=0)))
 
     return (error
-            + config.first_diff_weigth * first_diff
-            + config.second_diff_weigth * second_diff)
+            + config.first_diff_weight * first_diff
+            + config.second_diff_weight * second_diff)
 
 
 def load_model():
