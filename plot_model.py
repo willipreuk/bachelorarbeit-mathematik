@@ -7,6 +7,8 @@ from simulation.eom import eval_eom_ode
 from simulation.excitations import time_excitations
 from simulation.model_params import Params
 from simulation.data import read_data
+from simulation.rk import rk2_constant_step, rk4_constant_step
+
 
 def custom_sol_ivp(*args, **kwargs):
     """
@@ -26,7 +28,7 @@ def custom_sol_ivp(*args, **kwargs):
         def step(self):
             super().step()
             step_sizes.append(self.step_size)
-            print("Step size: ", self.step_size)
+            # print("Step size: ", self.step_size)
             step_sizes_t.append(self.t)
 
     solution = sp.integrate.solve_ivp(*args, **kwargs, method=Solver)
@@ -34,22 +36,29 @@ def custom_sol_ivp(*args, **kwargs):
     return solution, step_sizes_t, step_sizes
 
 
-def constant_sol_ivp(step_size, *args, **kwargs):
-    # Turn of error checking by setting rather high tolerances
-    return custom_sol_ivp(*args, **kwargs, a_tol=1e10, r_tol=1e10, max_step=step_size, min_step=step_size)
-
-
-def ref_sol():
+def discrete_ref_sol(t_eval):
     q_ini = Params.q_0
     q_0 = np.zeros(2 * Params.nq)
     q_0[0:4] = q_ini
 
-    t_eval = np.linspace(0, config.t_end, 1000)
+    if t_eval is None:
+        _eval = np.linspace(0, config.t_end, 1000)
 
     config.excitation = config.Excitations.SIMULATED
     solution, step_sizes_t, step_sizes = custom_sol_ivp(eval_eom_ode, (0, config.t_end), q_0, atol=1e-12, rtol=1e-12, t_eval=t_eval)
 
     return t_eval, solution.y, step_sizes_t, step_sizes
+
+
+def continuous_ref_sol():
+    q_ini = Params.q_0
+    q_0 = np.zeros(2 * Params.nq)
+    q_0[0:4] = q_ini
+
+    config.excitation = config.Excitations.SIMULATED
+    solution, _, _ = custom_sol_ivp(eval_eom_ode, (0, config.t_end), q_0, atol=1e-12, rtol=1e-12, dense_output=True)
+
+    return solution.sol
 
 
 
@@ -65,16 +74,19 @@ def sol():
     return t_eval, solution.y, step_sizes_t, step_sizes
 
 
-def sol_constant_step_size(step_size):
+def sol_constant_step_size(step_size, method='RK4'):
     q_ini = Params.q_0
     q_0 = np.zeros(2 * Params.nq)
     q_0[0:4] = q_ini
 
-    t_eval = np.linspace(0, config.t_end, 1000)
+    if method == 'RK4':
+        t, y = rk4_constant_step(eval_eom_ode, q_0, 0, config.t_end, step_size)
+    elif method == 'RK2':
+        t, y = rk2_constant_step(eval_eom_ode, q_0, 0, config.t_end, step_size)
+    else:
+        raise ValueError("Method not supported")
 
-    solution, step_sizes_t, step_sizes = constant_sol_ivp(step_size, eval_eom_ode, (0, config.t_end), q_0, t_eval=t_eval)
-
-    return t_eval, solution.y, step_sizes_t, step_sizes
+    return t, y
 
 
 # These functions are used to plot the figures in the thesis.
@@ -283,27 +295,40 @@ def plot_sol_ref_predicted():
 
 
 def plot_constant_step_size_error():
-    plt.figure(figsize=(5, 5))
+    plt.figure()
 
     config.excitation = config.Excitations.SIMULATED
-    config.first_diff_weight = 0
+    config.first_diff_weight = 0.01
     config.second_diff_weight = 0
 
-    t_eval, y_ref, _, _ = ref_sol()
+    ref_solution = continuous_ref_sol()
 
-    step_sizes = np.linspace(0.001, 1, 10)
+    step_sizes = np.linspace(0.0001, 0.01, 10)
 
-    config.excitation = config.Excitations.SIMULATED_NEURAL_NETWORK_PREDICT
-    errors = []
+    errors_rk2 = []
+    errors_rk4 = []
     for step_size in step_sizes:
-        _, y, _, _ = sol_constant_step_size(step_size)
-        errors.append(np.max(np.abs(y_ref - y)))
+        print("Step size: ", step_size)
 
-    print(errors)
+        config.excitation = config.Excitations.SIMULATED_NEURAL_NETWORK_PREDICT
 
-    plt.loglog(step_sizes, errors)
+        t, y = sol_constant_step_size(step_size, method='RK4')
+        _, y_rk2 = sol_constant_step_size(step_size, method='RK2')
+
+        y_ref = ref_solution(t)
+
+        errors_rk4.append(np.mean(np.abs(y_ref - np.transpose(y))))
+        errors_rk2.append(np.mean(np.abs(y_ref - np.transpose(y_rk2))))
+
+
+    print("Errors RK2: ", errors_rk2)
+    print("Errors RK4: ", errors_rk4)
+
+    plt.loglog(step_sizes, errors_rk2, label="RK2")
+    plt.loglog(step_sizes, errors_rk4, label="RK4")
     plt.xlabel("Step size")
-    plt.ylabel("Max error")
+    plt.ylabel("Error")
+    plt.legend()
 
 
 
@@ -324,4 +349,4 @@ def plot_data():
 
 if __name__ == '__main__':
     plot_constant_step_size_error()
-    plt.savefig("plot/plot_constant_step_size_error_nn.pdf")
+    plt.savefig("plot/plot_constant_step_size_error_9.pdf")

@@ -30,12 +30,16 @@ if __name__ == '__main__':
     config.second_diff_weight = 0
     config.first_diff_weight = 0
     train_nn()
+    plt.savefig("plot/loss-alpha-0.pdf")
     config.first_diff_weight = 0.01
     train_nn()
     config.first_diff_weight = 0.1
     train_nn()
     config.first_diff_weight = 0.25
+    plt.close("all")
     train_nn()
+    plt.savefig("plot/loss-alpha-0_25.pdf")
+
     # config.error_weight = 0.5
     # train_nn()
     # config.error_weight = 0.25
@@ -43,7 +47,7 @@ if __name__ == '__main__':
     # config.error_weight = 0.1
     # train_nn()
 
-    plt.figure(figsize=(10,5))
+    # plt.figure(figsize=(10,5))
 
     plot_x = np.arange(0, 10, config.delta_t_simulation / 10)
 
@@ -64,11 +68,10 @@ if __name__ == '__main__':
     # plt.plot(nn_x, predict(nn_x), label="Neural network" + f" (error weight: {config.error_weight})")
 
 
-    plt.plot(x_vals, data, "x", label="Data", alpha=0.5)
+    # plt.plot(x_vals, data, "x", label="Data", alpha=0.5)
     # plt.plot(plot_x, CubicSpline(x_vals, filter_data(data, 10, d=x_vals[1]-x_vals[0]))(plot_x), label="FFT")
 
-    plt.xlabel("Time")
-    plt.ylabel("Amplitude")
-    plt.legend()
+    # plt.xlabel("Time")
+    # plt.ylabel("Amplitude")
+    # plt.legend()
     # plt.show()
-    plt.savefig("plot/loss-beta.pdf")

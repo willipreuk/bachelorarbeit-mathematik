@@ -101,10 +101,11 @@ def train_nn():
         callbacks=[model_checkpoint_callback]
     )
 
-    plt.figure()
+    plt.figure(figsize=(10,5))
     plt.plot(history.history['loss'], label='loss')
-    plt.plot(history.history['val_loss'], label='val_loss')
     plt.title('Model loss')
+    plt.xlabel('Epoch')
+    plt.ylabel('Loss')
     plt.legend()
 
 
