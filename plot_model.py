@@ -1,6 +1,7 @@
 import numpy as np
 import scipy as sp
 import matplotlib.pyplot as plt
+import cProfile, pstats
 
 import config
 from simulation.eom import eval_eom_ode
@@ -347,6 +348,41 @@ def plot_data():
     plt.legend()
 
 
+def plot_runtime_rk45():
+    q_ini = Params.q_0
+    q_0 = np.zeros(2 * Params.nq)
+    q_0[0:4] = q_ini
+
+    t_eval = np.linspace(0, config.t_end, 1000)
+
+    tol_space = np.linspace(1e-2, 1e-8, 12)
+
+    ref_sol = continuous_ref_sol()
+
+    times = []
+    error = []
+    for tol in tol_space:
+        config.excitation = config.Excitations.SIMULATED_NEURAL_NETWORK_PREDICT
+        config.first_diff_weight = 0
+        config.second_diff_weight = 0
+
+        profiler = cProfile.Profile()
+        profiler.enable()
+        solution, _, _ = custom_sol_ivp(eval_eom_ode, (0, config.t_end), q_0, atol=tol, rtol=tol, t_eval=t_eval)
+        profiler.disable()
+        stats = pstats.Stats(profiler)
+
+        times.append(stats.get_stats_profile().total_tt)
+        error.append(np.mean(np.abs(ref_sol(t_eval) - solution.y)))
+
+    print(times)
+    plt.loglog(error, times, label="RK45")
+    plt.xlabel("Error")
+    plt.ylabel("Time $s$")
+    plt.legend()
+
+
+
 if __name__ == '__main__':
-    plot_constant_step_size_error()
-    plt.savefig("plot/plot_constant_step_size_error_9.pdf")
+    plot_runtime_rk45()
+    plt.savefig("plot/plot_runtime_rk45_2.pdf")

@@ -29,16 +29,18 @@ if __name__ == '__main__':
 
     config.second_diff_weight = 0
     config.first_diff_weight = 0
+    plt.figure(figsize=(10,5))
     train_nn()
     plt.savefig("plot/loss-alpha-0.pdf")
+
+    plt.figure(figsize=(10,5))
     config.first_diff_weight = 0.01
     train_nn()
     config.first_diff_weight = 0.1
     train_nn()
     config.first_diff_weight = 0.25
-    plt.close("all")
     train_nn()
-    plt.savefig("plot/loss-alpha-0_25.pdf")
+    plt.savefig("plot/loss-alpha-1.pdf")
 
     # config.error_weight = 0.5
     # train_nn()

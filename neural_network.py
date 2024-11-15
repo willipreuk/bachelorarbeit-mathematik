@@ -101,8 +101,7 @@ def train_nn():
         callbacks=[model_checkpoint_callback]
     )
 
-    plt.figure(figsize=(10,5))
-    plt.plot(history.history['loss'], label='loss')
+    plt.loglog(history.history['loss'], label=fr'$\alpha={config.first_diff_weight}$')
     plt.title('Model loss')
     plt.xlabel('Epoch')
     plt.ylabel('Loss')

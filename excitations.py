@@ -39,7 +39,7 @@ def time_excitations(t):
             last_second_dif_wight = config.second_diff_weight
             last_neural_network_predict_delta_t = config.neural_network_predict_delta_t
 
-        return _nn_spline(t), _nn_spline(t), _nn_spline(t, 1), _nn_spline(t, 1)
+        return _nn_spline(t), _nn_spline(t + config.phase_shift), _nn_spline(t, 1), _nn_spline(t + config.phase_shift, 1)
 
     if config.excitation == config.Excitations.SIMULATED:
         left, right = simulated_excitation(t)
