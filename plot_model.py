@@ -1,6 +1,7 @@
 import numpy as np
 import scipy as sp
 import matplotlib.pyplot as plt
+import matplotlib
 import cProfile, pstats
 
 import config
@@ -9,6 +10,51 @@ from simulation.excitations import time_excitations
 from simulation.model_params import Params
 from simulation.data import read_data
 from simulation.rk import rk2_constant_step, rk4_constant_step
+
+plt.rcParams.update({
+    "font.family": "serif",  # use serif/main font for text elements
+    "text.usetex": True,     # use inline math for ticks
+    "pgf.rcfonts": False     # don't setup fonts from rc parameters
+})
+# plt.style.use('seaborn')
+matplotlib.use('pgf')
+
+def set_size(width_pt=418.25372, fraction=1, subplots=(1, 1)):
+    """Set figure dimensions to sit nicely in our document.
+
+    Parameters
+    ----------
+    width_pt: float
+            Document width in points
+    fraction: float, optional
+            Fraction of the width which you wish the figure to occupy
+    subplots: array-like, optional
+            The number of rows and columns of subplots.
+    Returns
+    -------
+    fig_dim: tuple
+            Dimensions of figure in inches
+    """
+    # Width of figure (in pts)
+    fig_width_pt = width_pt * fraction
+    inches_per_pt = 1/72
+
+    golden_ratio = (5**.5 - 1) / 2
+
+    fig_width_in = fig_width_pt * inches_per_pt
+    fig_height_in = fig_width_in * golden_ratio * (subplots[0] / subplots[1])
+
+    return fig_width_in, fig_height_in
+
+
+def filter_data(data, cutoff_freq, d):
+    fft_result = np.fft.fft(data)
+    fft_freq = np.fft.fftfreq(len(data), d=d)
+
+    fft_result[np.abs(fft_freq) > cutoff_freq] = 0
+
+    filtered_data = np.fft.ifft(fft_result)
+    return filtered_data
 
 
 def custom_sol_ivp(*args, **kwargs):
@@ -46,7 +92,8 @@ def discrete_ref_sol(t_eval):
         _eval = np.linspace(0, config.t_end, 1000)
 
     config.excitation = config.Excitations.SIMULATED
-    solution, step_sizes_t, step_sizes = custom_sol_ivp(eval_eom_ode, (0, config.t_end), q_0, atol=1e-12, rtol=1e-12, t_eval=t_eval)
+    solution, step_sizes_t, step_sizes = custom_sol_ivp(eval_eom_ode, (0, config.t_end), q_0, atol=1e-12, rtol=1e-12,
+                                                        t_eval=t_eval)
 
     return t_eval, solution.y, step_sizes_t, step_sizes
 
@@ -62,7 +109,6 @@ def continuous_ref_sol():
     return solution.sol
 
 
-
 def sol():
     q_ini = Params.q_0
     q_0 = np.zeros(2 * Params.nq)
@@ -70,7 +116,8 @@ def sol():
 
     t_eval = np.linspace(0, config.t_end, 1000)
 
-    solution, step_sizes_t, step_sizes = custom_sol_ivp(eval_eom_ode, (0, config.t_end), q_0, atol=1e-6, rtol=1e-4, t_eval=t_eval)
+    solution, step_sizes_t, step_sizes = custom_sol_ivp(eval_eom_ode, (0, config.t_end), q_0, atol=1e-6, rtol=1e-4,
+                                                        t_eval=t_eval)
 
     return t_eval, solution.y, step_sizes_t, step_sizes
 
@@ -110,10 +157,11 @@ def plot_comparison_step_sizes():
 
     _, _, step_sizes_t, step_sizes = sol()
 
-    plt.plot(step_sizes_t, step_sizes, label="Step size (reference)")
-    plt.plot(step_sizes_t, time_excitations(step_sizes_t)[0], "--", label="Excitation (reference)")
+    plt.plot(step_sizes_t, step_sizes, label="Step size (ref)")
+    plt.plot(step_sizes_t, time_excitations(step_sizes_t)[0], "--", label="Excitation (ref)")
 
-    plt.xlabel("Time")
+    plt.xlabel("Time $t$ [s]")
+    plt.ylabel("Step size & Excitation")
     plt.legend()
 
 
@@ -136,7 +184,8 @@ def plot_comparison_nn_spline_delta_t():
 
     plt.plot(step_sizes_t, step_sizes, label=r"$\Delta x = 0.0025$")
 
-    plt.xlabel("Time")
+    plt.xlabel("Time $t$ [s]")
+    plt.ylabel("Step size")
     plt.legend()
 
 
@@ -160,7 +209,8 @@ def plot_comparison_nn_step_sizes():
     plt.plot(step_sizes_t, step_sizes, label=r"Step size (NN $\alpha = 0.01$)")
     plt.plot(step_sizes_t, time_excitations(step_sizes_t)[0], "--", label=r"Excitation (NN $\alpha = 0.01$)")
 
-    plt.xlabel("Time")
+    plt.xlabel("Time $t$ [s]")
+    plt.ylabel("Step size & Excitation")
     plt.legend()
 
 
@@ -182,10 +232,11 @@ def plot_sol_comparison():
 
     t_eval, y, _, _ = sol()
 
-    plt.plot(t_eval, y[0], "--", label="$z_a$ (reference)")
-    plt.plot(t_eval, y[1], "--", label="$z_s$ (reference)")
+    plt.plot(t_eval, y[0], "--", label="$z_a$ (ref)")
+    plt.plot(t_eval, y[1], "--", label="$z_s$ (ref)")
 
-    plt.xlabel("Time")
+    plt.xlabel("Time $t$ [s]")
+    plt.ylabel("Amplitude $z$ [m]")
     plt.legend()
 
 
@@ -234,7 +285,8 @@ def plot_sol_dif_comparison():
     plt.plot(t_eval, y[0], "--", label="$z_a$ (reference)")
     plt.plot(t_eval, y[1], "--", label="$z_s$ (reference)")
 
-    plt.xlabel("Time")
+    plt.xlabel("Time $t$ [s]")
+    plt.ylabel("Amplitude $z$ [m]")
     plt.legend()
 
 
@@ -259,10 +311,8 @@ def plot_sol_ref_predicted():
     plt.plot(t_eval, y[0], "--", label=r"$z_a$ (NN)")
     plt.plot(t_eval, y[1], "--", label=r"$z_s$ (NN)")
 
-
     print("Max diff z_a: ", np.max(np.abs(y_ref[0] - y[0])))
     print("Max diff z_s: ", np.max(np.abs(y_ref[1] - y[1])))
-
 
     config.excitation = config.Excitations.SIMULATED_NEURAL_NETWORK_PREDICT
     config.first_diff_weight = 0.01
@@ -272,7 +322,6 @@ def plot_sol_ref_predicted():
 
     plt.plot(t_eval, y[0], "--", label=r"$z_a$ (NN $\alpha=0.01$)")
     plt.plot(t_eval, y[1], "--", label=r"$z_s$ (NN $alpha=0.01$)")
-
 
     print("Max diff z_a: ", np.max(np.abs(y_ref[0] - y[0])))
     print("Max diff z_s: ", np.max(np.abs(y_ref[1] - y[1])))
@@ -286,12 +335,11 @@ def plot_sol_ref_predicted():
     plt.plot(t_eval, y[0], "--", label=r"$z_a$ (NN $\alpha=0.1$)")
     plt.plot(t_eval, y[1], "--", label=r"$z_s$ (NN $\alpha=0.1$)")
 
-
     print("Max diff z_a: ", np.max(np.abs(y_ref[0] - y[0])))
     print("Max diff z_s: ", np.max(np.abs(y_ref[1] - y[1])))
 
-    plt.xlabel("Time")
-    plt.ylabel("Amplitude")
+    plt.xlabel("Time $t$ [s]")
+    plt.ylabel("Amplitude $z$ [m]")
     plt.legend()
 
 
@@ -321,7 +369,6 @@ def plot_constant_step_size_error():
         errors_rk4.append(np.mean(np.abs(y_ref - np.transpose(y))))
         errors_rk2.append(np.mean(np.abs(y_ref - np.transpose(y_rk2))))
 
-
     print("Errors RK2: ", errors_rk2)
     print("Errors RK4: ", errors_rk4)
 
@@ -330,7 +377,6 @@ def plot_constant_step_size_error():
     plt.xlabel("Step size")
     plt.ylabel("Error")
     plt.legend()
-
 
 
 def plot_data():
@@ -343,8 +389,8 @@ def plot_data():
     plt.plot(x_vals, data_r, "xC2", alpha=0.3)
     plt.plot(x_vals, data_l, "xC1", alpha=0.3)
 
-    plt.xlabel("Time")
-    plt.ylabel("Amplitude")
+    plt.xlabel("Time $t$ [s]")
+    plt.ylabel("Amplitude [m]")
     plt.legend()
 
 
@@ -359,10 +405,7 @@ def plot_runtime_rk45():
 
     ref_sol = continuous_ref_sol()
 
-    times = []
-    error = []
-    for tol in tol_space:
-        config.excitation = config.Excitations.SIMULATED_NEURAL_NETWORK_PREDICT
+    def profile():
         config.first_diff_weight = 0
         config.second_diff_weight = 0
 
@@ -372,17 +415,52 @@ def plot_runtime_rk45():
         profiler.disable()
         stats = pstats.Stats(profiler)
 
-        times.append(stats.get_stats_profile().total_tt)
-        error.append(np.mean(np.abs(ref_sol(t_eval) - solution.y)))
+        return stats.get_stats_profile().total_tt, np.mean(np.abs(ref_sol(t_eval) - solution.y))
 
-    print(times)
-    plt.loglog(error, times, label="RK45")
+    times_predict = []
+    error_predict = []
+    times_spline = []
+    error_spline = []
+    for tol in tol_space:
+        config.excitation = config.Excitations.SIMULATED_NEURAL_NETWORK_PREDICT
+        time, error = profile()
+        times_predict.append(time)
+        error_predict.append(error)
+
+        config.excitation = config.Excitations.SIMULATED_NEURAL_NETWORK
+        time, error = profile()
+        times_spline.append(time)
+        error_spline.append(error)
+
+    plt.loglog(error_predict, times_predict, label="NN")
+    plt.loglog(error_spline, times_spline, label="NN (spline)")
     plt.xlabel("Error")
-    plt.ylabel("Time $s$")
+    plt.ylabel("Time $t$ [s]")
     plt.legend()
 
 
+def plot_data_fft():
+    config.data_source = config.TrainData.DATA
+    config.t_end = 10
+    data_l, _, x_vals = read_data()
+
+    plt.figure(figsize=set_size())
+    y_10 = filter_data(data_l, 10, d=x_vals[1] - x_vals[0])
+    y_5 = filter_data(data_l, 5, d=x_vals[1] - x_vals[0])
+    y_15 = filter_data(data_l, 15, d=x_vals[1] - x_vals[0])
+
+    plt.plot(x_vals, data_l, "x", label="Data", alpha=0.5)
+    plt.plot(x_vals, y_15, label="15Hz")
+    plt.plot(x_vals, y_10, label="10Hz")
+    plt.plot(x_vals, y_5, label="5Hz")
+
+    plt.xlabel("Time $t$ [s]")
+    plt.ylabel("Amplitude [m]")
+    plt.legend(loc='upper right')
+    plt.tight_layout()
+
 
 if __name__ == '__main__':
-    plot_runtime_rk45()
-    plt.savefig("plot/plot_runtime_rk45_2.pdf")
+    plot_data_fft()
+    # plt.savefig("plot/plot_data_fft.pdf", dpi=1000, bbox_inches='tight')
+    plt.savefig('plot/plot_data_fft.pgf', format='pgf')
