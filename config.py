@@ -11,6 +11,7 @@ class Excitations(Enum):
     SIMULATED_NEURAL_NETWORK = "simulated neural network excitations"
     DATA_SPLINE = "data spline excitations"
     DATA_NEURAL_NETWORK = "data neural network excitations"
+    DATA_NEURAL_NETWORK_PREDICT = "data neural network excitations prediction"
     SIMULATED_NEURAL_NETWORK_PREDICT = "simulated neural network excitations prediction"
 
 
@@ -28,7 +29,7 @@ delta_t = 0.025
 delta_t_simulation = delta_t / 10
 
 batch_size = 400
-epochs = 3000
+epochs = 750
 
 data_r_path = "data/Hhwayre.dat"
 data_l_path = "data/Hhwayli.dat"
