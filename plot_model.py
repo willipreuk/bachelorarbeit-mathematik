@@ -9,6 +9,7 @@ from simulation.eom import eval_eom_ode
 from simulation.excitations import time_excitations
 from simulation.model_params import Params
 from simulation.data import read_data
+from simulation.neural_network import load_model
 from simulation.rk import rk2_constant_step, rk4_constant_step
 
 plt.rcParams.update({
@@ -16,33 +17,17 @@ plt.rcParams.update({
     "text.usetex": True,     # use inline math for ticks
     "pgf.rcfonts": False     # don't setup fonts from rc parameters
 })
-# plt.style.use('seaborn')
 matplotlib.use('pgf')
 
-def set_size(width_pt=418.25372, fraction=1, subplots=(1, 1)):
-    """Set figure dimensions to sit nicely in our document.
-
-    Parameters
-    ----------
-    width_pt: float
-            Document width in points
-    fraction: float, optional
-            Fraction of the width which you wish the figure to occupy
-    subplots: array-like, optional
-            The number of rows and columns of subplots.
-    Returns
-    -------
-    fig_dim: tuple
-            Dimensions of figure in inches
-    """
-    # Width of figure (in pts)
-    fig_width_pt = width_pt * fraction
+def set_size(w_fraction=1.0, h_fraction=1.0) -> tuple[float, float]:
+    width_pt = 400
+    fig_width_pt = width_pt
     inches_per_pt = 1/72
 
     golden_ratio = (5**.5 - 1) / 2
 
-    fig_width_in = fig_width_pt * inches_per_pt
-    fig_height_in = fig_width_in * golden_ratio * (subplots[0] / subplots[1])
+    fig_width_in = fig_width_pt * inches_per_pt * w_fraction
+    fig_height_in = fig_width_in * golden_ratio * h_fraction
 
     return fig_width_in, fig_height_in
 
@@ -457,7 +442,24 @@ def plot_data_fft():
     plt.xlabel("Time $t$ [s]")
     plt.ylabel("Amplitude [m]")
     plt.legend(loc='upper right')
-    plt.tight_layout()
+    plt.tight_layout(pad=0.3)
+
+
+def plt_prediction():
+    config.data_source = config.TrainData.DATA
+    config.t_end = 3
+    data_l, _, x_vals = read_data()
+    model = load_model()
+
+    plt.figure(figsize=set_size(h_fraction=0.5))
+
+    plt.plot(x_vals, data_l, "x", label="Data", alpha=0.5)
+    plt.plot(x_vals, model.predict(x_vals), label="Prediction")
+
+    plt.xlabel("Time $t$ [s]")
+    plt.ylabel("Amplitude [m]")
+    plt.legend(loc='upper right')
+    plt.tight_layout(pad=0.3)
 
 
 if __name__ == '__main__':

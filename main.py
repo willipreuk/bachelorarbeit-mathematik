@@ -4,10 +4,7 @@ import numpy as np
 import config
 from simulation.data import read_data
 from simulation.neural_network import train_nn
-
-plt.rcParams['text.usetex'] = True
-
-
+from plot_model import set_size
 
 def filter_data(data, cutoff_freq, d):
     # Perform FFT
@@ -24,32 +21,31 @@ def filter_data(data, cutoff_freq, d):
 
 if __name__ == '__main__':
     nn_x = np.arange(0, 10, config.delta_t_simulation)
-    # real data
     data, _, x_vals = read_data()
+
+    plt.figure(figsize=set_size())
 
     config.second_diff_weight = 0
     config.first_diff_weight = 0
-    plt.figure(figsize=(10,5))
-    train_nn()
-    plt.savefig("plot/loss-alpha-0.pdf")
+    history = train_nn()
+    plt.loglog(history.history['loss'], label=fr'$\alpha={config.first_diff_weight}$')
 
-    plt.figure(figsize=(10,5))
     config.first_diff_weight = 0.01
-    train_nn()
+    history = train_nn()
+    plt.loglog(history.history['loss'], label=fr'$\alpha={config.first_diff_weight}$')
+
     config.first_diff_weight = 0.1
-    train_nn()
+    history = train_nn()
+    plt.loglog(history.history['loss'], label=fr'$\alpha={config.first_diff_weight}$')
+
     config.first_diff_weight = 0.25
-    train_nn()
-    plt.savefig("plot/loss-alpha-1.pdf")
+    history = train_nn()
+    plt.loglog(history.history['loss'], label=fr'$\alpha={config.first_diff_weight}$')
 
-    # config.error_weight = 0.5
-    # train_nn()
-    # config.error_weight = 0.25
-    # train_nn()
-    # config.error_weight = 0.1
-    # train_nn()
-
-    # plt.figure(figsize=(10,5))
+    plt.xlabel('Epoch')
+    plt.ylabel('Loss')
+    plt.legend()
+    plt.savefig('plot/plot_train_alpha.pgf', format='pgf')
 
     plot_x = np.arange(0, 10, config.delta_t_simulation / 10)
 

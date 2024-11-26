@@ -101,11 +101,7 @@ def train_nn():
         callbacks=[model_checkpoint_callback]
     )
 
-    plt.loglog(history.history['loss'], label=fr'$\alpha={config.first_diff_weight}$')
-    plt.title('Model loss')
-    plt.xlabel('Epoch')
-    plt.ylabel('Loss')
-    plt.legend()
+    return history
 
 
 def predict(t):
