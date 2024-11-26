@@ -3,7 +3,7 @@ import numpy as np
 
 import config
 from simulation.data import read_data
-from simulation.neural_network import train_nn
+from simulation.neural_network import train_nn, load_model
 from plot_model import set_size
 
 def filter_data(data, cutoff_freq, d):
@@ -23,27 +23,32 @@ if __name__ == '__main__':
     nn_x = np.arange(0, 10, config.delta_t_simulation)
     data, _, x_vals = read_data()
 
+    config.data_source = config.TrainData.DATA
     plt.figure(figsize=set_size())
+
+    config.epochs = 200
 
     config.second_diff_weight = 0
     config.first_diff_weight = 0
-    history = train_nn()
-    plt.loglog(history.history['loss'], label=fr'$\alpha={config.first_diff_weight}$')
+    train_nn()
+    plt.plot(nn_x, load_model().predict(nn_x), label=fr'$\alpha={config.first_diff_weight}$')
 
     config.first_diff_weight = 0.01
-    history = train_nn()
-    plt.loglog(history.history['loss'], label=fr'$\alpha={config.first_diff_weight}$')
+    train_nn()
+    plt.plot(nn_x, load_model().predict(nn_x), label=fr'$\alpha={config.first_diff_weight}$')
 
     config.first_diff_weight = 0.1
-    history = train_nn()
-    plt.loglog(history.history['loss'], label=fr'$\alpha={config.first_diff_weight}$')
+    train_nn()
+    plt.plot(nn_x, load_model().predict(nn_x), label=fr'$\alpha={config.first_diff_weight}$')
 
     config.first_diff_weight = 0.25
-    history = train_nn()
-    plt.loglog(history.history['loss'], label=fr'$\alpha={config.first_diff_weight}$')
+    train_nn()
+    plt.plot(nn_x, load_model().predict(nn_x), label=fr'$\alpha={config.first_diff_weight}$')
 
-    plt.xlabel('Epoch')
-    plt.ylabel('Loss')
+    plt.plot(x_vals, data, "x", label="Data", alpha=0.5)
+
+    plt.xlabel(r'Zeit $t$ [\unit{s}]')
+    plt.ylabel(r'Amplitude [\unit{m}]')
     plt.legend()
     plt.savefig('plot/plot_train_alpha.pgf', format='pgf')
 

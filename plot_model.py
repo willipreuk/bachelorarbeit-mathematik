@@ -1,7 +1,8 @@
 import numpy as np
 import scipy as sp
-import matplotlib.pyplot as plt
 import matplotlib
+matplotlib.use('pgf')
+import matplotlib.pyplot as plt
 import cProfile, pstats
 
 import config
@@ -9,15 +10,18 @@ from simulation.eom import eval_eom_ode
 from simulation.excitations import time_excitations
 from simulation.model_params import Params
 from simulation.data import read_data
-from simulation.neural_network import load_model
+from simulation.neural_network import load_model, train_nn
 from simulation.rk import rk2_constant_step, rk4_constant_step
 
 plt.rcParams.update({
-    "font.family": "serif",  # use serif/main font for text elements
-    "text.usetex": True,     # use inline math for ticks
-    "pgf.rcfonts": False     # don't setup fonts from rc parameters
+    "font.family": "serif",
+    "text.usetex": True,
+    "pgf.rcfonts": False,
+    "pgf.texsystem": "pdflatex",
+    "pgf.preamble": "\n".join([
+        r"\usepackage{siunitx}",
+    ])
 })
-matplotlib.use('pgf')
 
 def set_size(w_fraction=1.0, h_fraction=1.0) -> tuple[float, float]:
     width_pt = 400
@@ -461,8 +465,80 @@ def plt_prediction():
     plt.legend(loc='upper right')
 
 
+def plot_model_prediction_alpha():
+    config.data_source = config.TrainData.DATA
+    config.t_end = 10
+    config.epochs = 3000
+
+    nn_x = np.arange(0, config.t_end, config.delta_t_simulation / 10)
+    data, _, x_vals = read_data()
+    x_vals = x_vals[x_vals<config.t_end]
+    data = data[:len(x_vals)]
+
+    plt.figure(figsize=set_size())
+
+    config.second_diff_weight = 0
+    config.first_diff_weight = 0
+    train_nn()
+    plt.plot(nn_x, load_model().predict(nn_x), label=fr'$\alpha={config.first_diff_weight}$')
+
+    config.first_diff_weight = 0.01
+    train_nn()
+    plt.plot(nn_x, load_model().predict(nn_x), label=fr'$\alpha={config.first_diff_weight}$')
+
+    config.first_diff_weight = 0.1
+    train_nn()
+    plt.plot(nn_x, load_model().predict(nn_x), label=fr'$\alpha={config.first_diff_weight}$')
+
+    config.first_diff_weight = 0.25
+    train_nn()
+    plt.plot(nn_x, load_model().predict(nn_x), label=fr'$\alpha={config.first_diff_weight}$')
+
+    plt.plot(x_vals, data, "x", label="Messdaten", alpha=0.5)
+
+    plt.xlabel(r'Zeit $t$ [\unit{s}]')
+    plt.ylabel(r'Auslenkung [\unit{m}]')
+    plt.legend()
+
+
+def plot_model_prediction_beta():
+    config.data_source = config.TrainData.DATA
+    config.t_end = 10
+    config.epochs = 3000
+
+    nn_x = np.arange(0, config.t_end, config.delta_t_simulation / 10)
+    data, _, x_vals = read_data()
+    x_vals = x_vals[x_vals<config.t_end]
+    data = data[:len(x_vals)]
+
+    plt.figure(figsize=set_size())
+
+    config.first_diff_weight = 0
+    config.second_diff_weight = 0
+    train_nn()
+    plt.plot(nn_x, load_model().predict(nn_x), label=fr'$\beta={config.first_diff_weight}$')
+
+    config.second_diff_weight = 0.01
+    train_nn()
+    plt.plot(nn_x, load_model().predict(nn_x), label=fr'$\beta={config.first_diff_weight}$')
+
+    config.second_diff_weight = 0.1
+    train_nn()
+    plt.plot(nn_x, load_model().predict(nn_x), label=fr'$\beta={config.first_diff_weight}$')
+
+    config.second_diff_weight = 0.25
+    train_nn()
+    plt.plot(nn_x, load_model().predict(nn_x), label=fr'$\beta={config.first_diff_weight}$')
+
+    plt.plot(x_vals, data, "x", label="Messdaten", alpha=0.5)
+
+    plt.xlabel(r'Zeit $t$ [\unit{s}]')
+    plt.ylabel(r'Auslenkung [\unit{m}]')
+    plt.legend()
+
+
 if __name__ == '__main__':
-    plot_data()
+    plot_model_prediction_beta()
 
     plt.tight_layout(pad=0.3)
-    plt.savefig('plot/plot_data.pgf', format='pgf')
+    plt.savefig('plot/plot_model_prediction_beta.pgf', format='pgf')
