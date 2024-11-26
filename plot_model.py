@@ -151,8 +151,7 @@ def plot_comparison_step_sizes():
 
 
 def plot_comparison_nn_spline_delta_t():
-    plt.figure(figsize=(10, 5))
-
+    plt.figure(figsize=set_size())
     config.excitation = config.Excitations.SIMULATED_NEURAL_NETWORK
     config.first_diff_weight = 0
     config.second_diff_weight = 0
@@ -161,16 +160,16 @@ def plot_comparison_nn_spline_delta_t():
 
     _, _, step_sizes_t, step_sizes = sol()
 
-    plt.plot(step_sizes_t, step_sizes, label=r"$\Delta x = 0.025$")
+    plt.plot(step_sizes_t, step_sizes, label=r"$\Delta t = 0.025$")
 
     config.neural_network_predict_delta_t = config.delta_t / 10
 
     _, _, step_sizes_t, step_sizes = sol()
 
-    plt.plot(step_sizes_t, step_sizes, label=r"$\Delta x = 0.0025$")
+    plt.plot(step_sizes_t, step_sizes, label=r"$\Delta t = 0.0025$")
 
-    plt.xlabel("Time $t$ [s]")
-    plt.ylabel("Step size")
+    plt.xlabel(r"Zeit $t$ [\unit{s}]")
+    plt.ylabel(r"Schrittweite $h$")
     plt.legend()
 
 
@@ -365,17 +364,19 @@ def plot_constant_step_size_error():
 
 
 def plot_data():
+    config.data_source = config.TrainData.DATA
+
     data_l, data_r, x_vals = read_data()
 
-    plt.figure(figsize=(10, 5))
+    plt.figure(figsize=set_size())
 
-    plt.plot(x_vals, data_l, "C1", label="Left", alpha=1)
-    plt.plot(x_vals, data_r, "C2", label="Right", alpha=1)
+    plt.plot(x_vals, data_l, "C1", label="Links", alpha=1)
+    plt.plot(x_vals, data_r, "C2", label="Rechts", alpha=1)
     plt.plot(x_vals, data_r, "xC2", alpha=0.3)
     plt.plot(x_vals, data_l, "xC1", alpha=0.3)
 
-    plt.xlabel("Time $t$ [s]")
-    plt.ylabel("Amplitude [m]")
+    plt.xlabel(r"Zeit $t$ [\unit{s}]")
+    plt.ylabel(r"Auslenkung [\unit{m}]")
     plt.legend()
 
 
@@ -420,7 +421,7 @@ def plot_runtime_rk45():
     plt.loglog(error_predict, times_predict, label="NN")
     plt.loglog(error_spline, times_spline, label="NN (spline)")
     plt.xlabel("Error")
-    plt.ylabel("Time $t$ [s]")
+    plt.ylabel("Zeit $t$ [s]")
     plt.legend()
 
 
@@ -434,15 +435,14 @@ def plot_data_fft():
     y_5 = filter_data(data_l, 5, d=x_vals[1] - x_vals[0])
     y_15 = filter_data(data_l, 15, d=x_vals[1] - x_vals[0])
 
-    plt.plot(x_vals, data_l, "x", label="Data", alpha=0.5)
+    plt.plot(x_vals, data_l, "x", label="Messdaten", alpha=0.5)
     plt.plot(x_vals, y_15, label="15Hz")
     plt.plot(x_vals, y_10, label="10Hz")
     plt.plot(x_vals, y_5, label="5Hz")
 
-    plt.xlabel("Time $t$ [s]")
-    plt.ylabel("Amplitude [m]")
+    plt.xlabel(r"Zeit $t$ [\unit{s}]")
+    plt.ylabel(r"Auslenkung [\unit{m}]")
     plt.legend(loc='upper right')
-    plt.tight_layout(pad=0.3)
 
 
 def plt_prediction():
@@ -459,10 +459,10 @@ def plt_prediction():
     plt.xlabel("Time $t$ [s]")
     plt.ylabel("Amplitude [m]")
     plt.legend(loc='upper right')
-    plt.tight_layout(pad=0.3)
 
 
 if __name__ == '__main__':
-    plot_data_fft()
-    # plt.savefig("plot/plot_data_fft.pdf", dpi=1000, bbox_inches='tight')
-    plt.savefig('plot/plot_data_fft.pgf', format='pgf')
+    plot_data()
+
+    plt.tight_layout(pad=0.3)
+    plt.savefig('plot/plot_data.pgf', format='pgf')
