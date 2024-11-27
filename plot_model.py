@@ -352,7 +352,7 @@ def plot_constant_step_size_error():
 
     plt.loglog(step_sizes, errors_rk2, label="RK2")
     plt.loglog(step_sizes, errors_rk4, label="RK4")
-    plt.xlabel("Step size")
+    plt.xlabel("Schrittweite $h$")
     plt.ylabel("Error")
     plt.legend()
 
@@ -381,7 +381,7 @@ def plot_runtime_rk45():
 
     t_eval = np.linspace(0, config.t_end, 1000)
 
-    tol_space = np.linspace(1e-2, 1e-8, 12)
+    tol_space = np.linspace(1e-2, 1e-5, 8)
 
     ref_sol = continuous_ref_sol()
 
@@ -549,9 +549,23 @@ def plot_model_prediction_beta():
     plt.legend()
 
 
+def plot_training_loss():
+    config.data_source = config.TrainData.DATA
+    config.t_end = 10
+    config.epochs = 3000
+
+    config.first_diff_weight = 0
+    config.second_diff_weight = 0
+    history = train_nn()
+    plt.loglog(history.history["loss"], label=fr'Mittlere quadratische Abweichung')
+
+    plt.xlabel("Epochen")
+    plt.ylabel("Loss")
+
+
 if __name__ == '__main__':
-    plot_sol_dif_comparison()
+    plot_runtime_rk45()
 
     plt.tight_layout(pad=0.3)
-    plt.savefig('plot/plot_sol_dif_comparison.pgf', format='pgf')
+    plt.savefig('plot/plot_runtime_rk45.pgf', format='pgf')
 
