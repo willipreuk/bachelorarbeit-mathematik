@@ -15,7 +15,7 @@ def simulated_excitation(t):
     # data_r = 0.1 * np.sin(2 * np.pi * (t + 0.1))
 
     def f(x):
-        return 0.01 * (np.sin(0.2 * np.pi * x) + np.sin(0.4 * np.pi * x) + np.sin(0.75 * np.pi * x) + np.sin(1 * np.pi * x) + np.sin(1.5 * np.pi * x))
+        return 0.1 * (np.sin(0.2 * np.pi * x) + np.sin(0.4 * np.pi * x) + np.sin(0.75 * np.pi * x) + np.sin(1 * np.pi * x) + np.sin(1.5 * np.pi * x))
 
     return f(t), f(t + config.phase_shift)
 
@@ -32,11 +32,11 @@ def simulated_diff_excitation(t):
     # data_r_diff = 0.1 * np.cos(2 * np.pi * (t + 0.1)) * 2 * np.pi
 
     def f_prime(x):
-        return 0.01 * (0.2 * np.pi * np.cos(0.2 * np.pi * t)
-                       + 0.4 * np.pi * np.cos(0.4 * np.pi * t)
-                       + 0.75 * np.pi * np.cos(0.75 * np.pi * t)
-                       + 1 * np.pi * np.cos(1 * np.pi * t)
-                       + 1.5 * np.pi * np.cos(1.5 * np.pi * t))
+        return 0.1 * (0.2 * np.pi * np.cos(0.2 * np.pi * x)
+                       + 0.4 * np.pi * np.cos(0.4 * np.pi * x)
+                       + 0.75 * np.pi * np.cos(0.75 * np.pi * x)
+                       + 1 * np.pi * np.cos(1 * np.pi * x)
+                       + 1.5 * np.pi * np.cos(1.5 * np.pi * x))
 
     return f_prime(t), f_prime(t + config.phase_shift)
 

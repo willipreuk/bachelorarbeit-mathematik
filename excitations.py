@@ -44,7 +44,7 @@ def time_excitations(t):
     if config.excitation == config.Excitations.DATA_NEURAL_NETWORK or config.excitation == config.Excitations.SIMULATED_NEURAL_NETWORK:
         if (config.first_diff_weight, config.second_diff_weight, config.neural_network_predict_delta_t) != (
                 last_first_dif_weight, last_second_dif_wight, last_neural_network_predict_delta_t):
-            _fine_x_vals = np.arange(0, config.t_end, config.neural_network_predict_delta_t)
+            _fine_x_vals = np.arange(0, config.t_end + config.phase_shift, config.neural_network_predict_delta_t)
             _predicted = predict(_fine_x_vals).flatten()
             _nn_spline = sp.interpolate.CubicSpline(_fine_x_vals, _predicted)
             last_first_dif_weight = config.first_diff_weight

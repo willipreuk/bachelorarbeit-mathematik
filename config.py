@@ -29,7 +29,7 @@ delta_t = 0.025
 delta_t_simulation = delta_t / 10
 
 batch_size = 400
-epochs = 750
+epochs = 3000
 
 data_r_path = "data/Hhwayre.dat"
 data_l_path = "data/Hhwayli.dat"

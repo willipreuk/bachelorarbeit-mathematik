@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 import cProfile, pstats
 
 import config
-from simulation.eom import eval_eom_ode
+from simulation.eom import eval_eom_ode, eval_eom_ini
 from simulation.excitations import time_excitations
 from simulation.model_params import Params
 from simulation.data import read_data
@@ -72,10 +72,15 @@ def custom_sol_ivp(*args, **kwargs):
     return solution, step_sizes_t, step_sizes
 
 
-def discrete_ref_sol(t_eval):
-    q_ini = Params.q_0
+def get_q0():
+    q_ini = Params.q_0_sim if config.data_source == config.TrainData.SIMULATED else Params.q_0
     q_0 = np.zeros(2 * Params.nq)
     q_0[0:4] = q_ini
+
+    return q_0
+
+def discrete_ref_sol(t_eval):
+    q_0 = get_q0()
 
     if t_eval is None:
         _eval = np.linspace(0, config.t_end, 1000)
@@ -88,9 +93,7 @@ def discrete_ref_sol(t_eval):
 
 
 def continuous_ref_sol():
-    q_ini = Params.q_0
-    q_0 = np.zeros(2 * Params.nq)
-    q_0[0:4] = q_ini
+    q_0 = get_q0()
 
     config.excitation = config.Excitations.SIMULATED
     solution, _, _ = custom_sol_ivp(eval_eom_ode, (0, config.t_end), q_0, atol=1e-12, rtol=1e-12, dense_output=True)
@@ -99,9 +102,7 @@ def continuous_ref_sol():
 
 
 def sol():
-    q_ini = Params.q_0
-    q_0 = np.zeros(2 * Params.nq)
-    q_0[0:4] = q_ini
+    q_0 = get_q0()
 
     t_eval = np.linspace(0, config.t_end, 1000)
 
@@ -112,9 +113,7 @@ def sol():
 
 
 def sol_constant_step_size(step_size, method='RK4'):
-    q_ini = Params.q_0
-    q_0 = np.zeros(2 * Params.nq)
-    q_0[0:4] = q_ini
+    q_0 = get_q0()
 
     if method == 'RK4':
         t, y = rk4_constant_step(eval_eom_ode, q_0, 0, config.t_end, step_size)
@@ -229,8 +228,7 @@ def plot_sol_comparison():
 
 
 def plot_sol_dif_comparison():
-    plt.figure(figsize=(10, 5))
-
+    plt.figure(figsize=set_size())
     config.excitation = config.Excitations.SIMULATED_NEURAL_NETWORK
     config.first_diff_weight = 0
     config.second_diff_weight = 0
@@ -256,24 +254,16 @@ def plot_sol_dif_comparison():
     plt.plot(t_eval, y[0], label=r"$z_a$ (NN $\alpha = 0.1$)")
     plt.plot(t_eval, y[1], label=r"$z_s$ (NN $\alpha = 0.1$)")
 
-    config.first_diff_weight = 0.25
-    config.second_diff_weight = 0
-
-    t_eval, y, _, _ = sol()
-
-    plt.plot(t_eval, y[0], label=r"$z_a$ (NN $\alpha = 0.25$)")
-    plt.plot(t_eval, y[1], label=r"$z_s$ (NN $\alpha = 0.25$)")
-
     config.excitation = config.Excitations.SIMULATED
     config.first_diff_weight = 0
     config.second_diff_weight = 0
 
     t_eval, y, _, _ = sol()
 
-    plt.plot(t_eval, y[0], "--", label="$z_a$ (reference)")
-    plt.plot(t_eval, y[1], "--", label="$z_s$ (reference)")
+    plt.plot(t_eval, y[0], "--", label="$z_a$ (Referenz)")
+    plt.plot(t_eval, y[1], "--", label="$z_s$ (Referenz)")
 
-    plt.xlabel("Time $t$ [s]")
+    plt.xlabel("Zeit $t$ [s]")
     plt.ylabel("Amplitude $z$ [m]")
     plt.legend()
 
@@ -466,9 +456,8 @@ def plt_prediction():
 
 
 def plot_model_prediction_alpha():
-    config.data_source = config.TrainData.DATA
-    config.t_end = 10
-    config.epochs = 3000
+    config.data_source = config.TrainData.SIMULATED
+    config.t_end = 3
 
     nn_x = np.arange(0, config.t_end, config.delta_t_simulation / 10)
     data, _, x_vals = read_data()
@@ -479,22 +468,45 @@ def plot_model_prediction_alpha():
 
     config.second_diff_weight = 0
     config.first_diff_weight = 0
-    train_nn()
     plt.plot(nn_x, load_model().predict(nn_x), label=fr'$\alpha={config.first_diff_weight}$')
 
     config.first_diff_weight = 0.01
-    train_nn()
     plt.plot(nn_x, load_model().predict(nn_x), label=fr'$\alpha={config.first_diff_weight}$')
 
     config.first_diff_weight = 0.1
-    train_nn()
     plt.plot(nn_x, load_model().predict(nn_x), label=fr'$\alpha={config.first_diff_weight}$')
 
     config.first_diff_weight = 0.25
-    train_nn()
     plt.plot(nn_x, load_model().predict(nn_x), label=fr'$\alpha={config.first_diff_weight}$')
 
     plt.plot(x_vals, data, "x", label="Messdaten", alpha=0.5)
+
+    plt.xlabel(r'Zeit $t$ [\unit{s}]')
+    plt.ylabel(r'Auslenkung [\unit{m}]')
+    plt.legend()
+
+
+def plot_model_prediction_alpha_simulated():
+    config.data_source = config.TrainData.SIMULATED
+
+    nn_x = np.arange(0, config.t_end, config.delta_t_simulation / 10)
+    data, _, x_vals = read_data()
+    x_vals = x_vals[x_vals<config.t_end]
+    data = data[:len(x_vals)]
+
+    plt.figure(figsize=set_size())
+
+    config.second_diff_weight = 0
+    config.first_diff_weight = 0
+    plt.plot(nn_x, load_model().predict(nn_x), label=fr'$\alpha={config.first_diff_weight}$')
+
+    config.first_diff_weight = 0.01
+    plt.plot(nn_x, load_model().predict(nn_x), label=fr'$\alpha={config.first_diff_weight}$')
+
+    config.first_diff_weight = 0.1
+    plt.plot(nn_x, load_model().predict(nn_x), label=fr'$\alpha={config.first_diff_weight}$')
+
+    plt.plot(x_vals[9::10], data[9::10], "--", label="Messdaten")
 
     plt.xlabel(r'Zeit $t$ [\unit{s}]')
     plt.ylabel(r'Auslenkung [\unit{m}]')
@@ -538,7 +550,8 @@ def plot_model_prediction_beta():
 
 
 if __name__ == '__main__':
-    plot_model_prediction_beta()
+    plot_sol_dif_comparison()
 
     plt.tight_layout(pad=0.3)
-    plt.savefig('plot/plot_model_prediction_beta.pgf', format='pgf')
+    plt.savefig('plot/plot_sol_dif_comparison.pgf', format='pgf')
+

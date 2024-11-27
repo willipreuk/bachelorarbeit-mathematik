@@ -18,8 +18,7 @@ def _f_spring(c, d, m, cfrom, cfromp, cto, ctop):
     """
 
     k = 2 * d * np.sqrt(m * c)
-    slen = np.linalg.norm(cfrom - cto)
-
+    slen = np.linalg.norm(cfrom - cto) + np.finfo(float).eps
     f = c * slen + k * np.sum((cto - cfrom) * (ctop - cfromp)) / slen
 
     return f * (cto - cfrom) / slen

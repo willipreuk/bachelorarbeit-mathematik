@@ -10,6 +10,7 @@ class Params:
     te        = 10.0            # [s]       end time
 
     q_0       = np.array([1.321364, 1.193035, 0.035618, 0.035388])
+    q_0_sim   = np.array([ 1.31313602,  1.11813602, -0.01583744, -0.50262734])
 
     # geometrical data
     hha       = 2.8             # [m]       overall height of car
