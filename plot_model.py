@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 import cProfile, pstats
 
 import config
-from simulation.eom import eval_eom_ode, eval_eom_ini
+from simulation.eom import eval_eom_ode
 from simulation.excitations import time_excitations
 from simulation.model_params import Params
 from simulation.data import read_data
@@ -375,13 +375,13 @@ def plot_data():
 
 
 def plot_runtime_rk45():
-    q_ini = Params.q_0
-    q_0 = np.zeros(2 * Params.nq)
-    q_0[0:4] = q_ini
+    plt.figure(figsize=set_size())
+    q_0 = get_q0()
 
     t_eval = np.linspace(0, config.t_end, 1000)
 
-    tol_space = np.linspace(1e-2, 1e-5, 8)
+    tol_space = np.logspace(-5.5, -2.0,10)
+    print(tol_space)
 
     ref_sol = continuous_ref_sol()
 
@@ -412,10 +412,56 @@ def plot_runtime_rk45():
         times_spline.append(time)
         error_spline.append(error)
 
+    print(error_predict, times_predict)
+    print(error_spline, times_spline)
+    print(tol_space)
     plt.loglog(error_predict, times_predict, label="NN")
     plt.loglog(error_spline, times_spline, label="NN (spline)")
-    plt.xlabel("Error")
-    plt.ylabel("Zeit $t$ [s]")
+    plt.xlabel(r"Error")
+    plt.ylabel(r"Zeit $t$ [\unit{s}]")
+    plt.legend()
+
+
+def plot_runtime_constant_step():
+    plt.figure(figsize=set_size())
+    step_sizes = np.logspace(-4, -2.0,10)
+
+    ref_sol = continuous_ref_sol()
+
+    config.excitation = config.Excitations.SIMULATED_NEURAL_NETWORK_PREDICT
+
+    def profile(step_size, method="RK4"):
+        config.first_diff_weight = 0
+        config.second_diff_weight = 0
+
+        profiler = cProfile.Profile()
+        profiler.enable()
+        t, y = sol_constant_step_size(step_size, method=method)
+        profiler.disable()
+        stats = pstats.Stats(profiler)
+
+        return stats.get_stats_profile().total_tt, np.mean(np.abs(ref_sol(t) - np.transpose(y)))
+
+    times_rk4 = []
+    error_rk4 = []
+    times_rk2 = []
+    error_rk2 = []
+    for h in step_sizes:
+        print("Profile step size: ", h)
+        time, error = profile(h, method="RK4")
+        times_rk4.append(time)
+        error_rk4.append(error)
+
+        time, error = profile(h, method="RK2")
+        times_rk2.append(time)
+        error_rk2.append(error)
+
+
+    print(error_rk4)
+    plt.loglog(error_rk4, times_rk4, label="RK4")
+    plt.loglog(error_rk2, times_rk2, label="RK2")
+    plt.xlabel(r"Error")
+    plt.ylabel(r"Zeit $t$ [\unit{s}]")
     plt.legend()
 
 
@@ -557,15 +603,15 @@ def plot_training_loss():
     config.first_diff_weight = 0
     config.second_diff_weight = 0
     history = train_nn()
-    plt.loglog(history.history["loss"], label=fr'Mittlere quadratische Abweichung')
+    plt.loglog(history.history["loss"], label=r'$\mu_{\text{MSE}}$')
 
     plt.xlabel("Epochen")
     plt.ylabel("Loss")
 
 
 if __name__ == '__main__':
-    plot_runtime_rk45()
+    plot_runtime_constant_step()
 
     plt.tight_layout(pad=0.3)
-    plt.savefig('plot/plot_runtime_rk45.pgf', format='pgf')
+    plt.savefig('plot/plot_runtime_constant_step.pgf', format='pgf')
 
