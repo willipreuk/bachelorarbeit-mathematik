@@ -4,8 +4,8 @@ from scipy.optimize import approx_fprime
 
 import config
 from neural_network import predict
-from simulation.data import read_data, simulated_excitation, simulated_diff_excitation
-from simulation.neural_network import load_model
+from data import read_data, simulated_excitation, simulated_diff_excitation
+from neural_network import load_model
 
 def _filter_data(data, cutoff_freq, sample_rate):
     fft_result = np.fft.fft(data)

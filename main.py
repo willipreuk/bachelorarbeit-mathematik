@@ -1,8 +1,5 @@
-import sys,os
-sys.path.append(os.getcwd())
-
 import config
-from simulation.neural_network import train_nn
+from neural_network import train_nn
 
 
 def train_alpha():

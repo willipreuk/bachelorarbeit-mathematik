@@ -1,7 +1,5 @@
 import numpy as np
-from matplotlib import pyplot as plt
 from sklearn.model_selection import train_test_split
-
 from data import read_data
 from keras import layers, Input, Sequential, callbacks, models, optimizers, ops, losses
 import tensorflow as tf
