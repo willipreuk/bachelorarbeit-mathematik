@@ -166,13 +166,13 @@ def plot_comparison_nn_spline_delta_t():
 
     _, _, step_sizes_t, step_sizes = sol()
 
-    plt.plot(step_sizes_t, step_sizes, label=r"$\Delta t = 0.025$")
+    plt.plot(step_sizes_t, step_sizes, label=r"$\Delta t = \num{0.025}$")
 
     config.neural_network_predict_delta_t = config.delta_t / 10
 
     _, _, step_sizes_t, step_sizes = sol()
 
-    plt.plot(step_sizes_t, step_sizes, label=r"$\Delta t = 0.0025$")
+    plt.plot(step_sizes_t, step_sizes, label=r"$\Delta t = \num{0.0025}$")
 
     plt.xlabel(r"Zeit $t$ [\unit{s}]")
     plt.ylabel(r"Schrittweite $h$")
@@ -196,8 +196,8 @@ def plot_comparison_nn_step_sizes():
 
     _, _, step_sizes_t, step_sizes = sol()
 
-    plt.plot(step_sizes_t, step_sizes, label=r"Step size (NN $\alpha = 0.01$)")
-    plt.plot(step_sizes_t, time_excitations(step_sizes_t)[0], "--", label=r"Excitation (NN $\alpha = 0.01$)")
+    plt.plot(step_sizes_t, step_sizes, label=r"Step size (NN $\alpha = \num{0.01}$)")
+    plt.plot(step_sizes_t, time_excitations(step_sizes_t)[0], "--", label=r"Excitation (NN $\alpha = \num{0.01}$)")
 
     plt.xlabel("Time $t$ [s]")
     plt.ylabel("Step size & Excitation")
@@ -213,8 +213,8 @@ def plot_sol_comparison():
 
     t_eval, y, _, _ = sol()
 
-    plt.plot(t_eval, y[0], label="$z_a$ (NN)")
-    plt.plot(t_eval, y[1], label="$z_s$ (NN)")
+    plt.plot(t_eval, y[0], label="$z_\mathrm{a}$ (NN)")
+    plt.plot(t_eval, y[1], label="$z_\mathrm{s}$ (NN)")
 
     config.excitation = config.Excitations.SIMULATED
     config.first_diff_weight = 0
@@ -222,11 +222,11 @@ def plot_sol_comparison():
 
     t_eval, y, _, _ = sol()
 
-    plt.plot(t_eval, y[0], "--", label="$z_a$ (ref)")
-    plt.plot(t_eval, y[1], "--", label="$z_s$ (ref)")
+    plt.plot(t_eval, y[0], "--", label="$z_\mathrm{a}$ (ref)")
+    plt.plot(t_eval, y[1], "--", label="$z_\mathrm{s}$ (ref)")
 
-    plt.xlabel("Time $t$ [s]")
-    plt.ylabel("Amplitude $z$ [m]")
+    plt.xlabel(r"Zeit $t$ [\unit{s}]")
+    plt.ylabel(r"Auslenkung $z$ [\unit{m}]")
     plt.legend()
 
 
@@ -238,24 +238,24 @@ def plot_sol_dif_comparison():
 
     t_eval, y, _, _ = sol()
 
-    plt.plot(t_eval, y[0], label=r"$z_a$ (NN $\alpha = 0$)")
-    plt.plot(t_eval, y[1], label=r"$z_s$ (NN $\alpha = 0$)")
+    plt.plot(t_eval, y[0], label=r"$z_\mathrm{a}$ (NN $\alpha = 0$)")
+    plt.plot(t_eval, y[1], label=r"$z_\mathrm{s}$ (NN $\alpha = 0$)")
 
     config.first_diff_weight = 0.01
     config.second_diff_weight = 0
 
     t_eval, y, _, _ = sol()
 
-    plt.plot(t_eval, y[0], label=r"$z_a$ (NN $\alpha = 0.01$)")
-    plt.plot(t_eval, y[1], label=r"$z_s$ (NN $\alpha = 0.01$)")
+    plt.plot(t_eval, y[0], label=r"$z_\mathrm{a}$ (NN $\alpha = \num{0.01}$)")
+    plt.plot(t_eval, y[1], label=r"$z_\mathrm{s}$ (NN $\alpha = \num{0.01}$)")
 
     config.first_diff_weight = 0.1
     config.second_diff_weight = 0
 
     t_eval, y, _, _ = sol()
 
-    plt.plot(t_eval, y[0], label=r"$z_a$ (NN $\alpha = 0.1$)")
-    plt.plot(t_eval, y[1], label=r"$z_s$ (NN $\alpha = 0.1$)")
+    plt.plot(t_eval, y[0], label=r"$z_\mathrm{a}$ (NN $\alpha = \num{0.1}$)")
+    plt.plot(t_eval, y[1], label=r"$z_\mathrm{s}$ (NN $\alpha = \num{0.1}$)")
 
     config.excitation = config.Excitations.SIMULATED
     config.first_diff_weight = 0
@@ -263,11 +263,11 @@ def plot_sol_dif_comparison():
 
     t_eval, y, _, _ = sol()
 
-    plt.plot(t_eval, y[0], "--", label="$z_a$ (Referenz)")
-    plt.plot(t_eval, y[1], "--", label="$z_s$ (Referenz)")
+    plt.plot(t_eval, y[0], "--", label="$z_\mathrm{a}$ (Referenz)")
+    plt.plot(t_eval, y[1], "--", label="$z_\mathrm{s}$ (Referenz)")
 
-    plt.xlabel("Zeit $t$ [s]")
-    plt.ylabel("Amplitude $z$ [m]")
+    plt.xlabel(r"Zeit $t$ [s]")
+    plt.ylabel(r"Auslenkung $z$ [\unit{m}]")
     plt.legend()
 
 
@@ -280,8 +280,8 @@ def plot_sol_ref_predicted():
 
     t_eval, y_ref, _, _ = sol()
 
-    plt.plot(t_eval, y_ref[0], label=r"$z_a$ (ref)")
-    plt.plot(t_eval, y_ref[1], label=r"$z_s$ (ref)")
+    plt.plot(t_eval, y_ref[0], label=r"$z_\mathrm{a}$ (ref)")
+    plt.plot(t_eval, y_ref[1], label=r"$z_\mathrm{s}$ (ref)")
 
     config.excitation = config.Excitations.SIMULATED_NEURAL_NETWORK_PREDICT
     config.first_diff_weight = 0
@@ -289,8 +289,8 @@ def plot_sol_ref_predicted():
 
     t_eval, y, _, _ = sol()
 
-    plt.plot(t_eval, y[0], "--", label=r"$z_a$ (NN)")
-    plt.plot(t_eval, y[1], "--", label=r"$z_s$ (NN)")
+    plt.plot(t_eval, y[0], "--", label=r"$z_\mathrm{a}$ (NN)")
+    plt.plot(t_eval, y[1], "--", label=r"$z_\mathrm{s}$ (NN)")
 
     print("Max diff z_a: ", np.max(np.abs(y_ref[0] - y[0])))
     print("Max diff z_s: ", np.max(np.abs(y_ref[1] - y[1])))
@@ -301,8 +301,8 @@ def plot_sol_ref_predicted():
 
     t_eval, y, _, _ = sol()
 
-    plt.plot(t_eval, y[0], "--", label=r"$z_a$ (NN $\alpha=0.01$)")
-    plt.plot(t_eval, y[1], "--", label=r"$z_s$ (NN $alpha=0.01$)")
+    plt.plot(t_eval, y[0], "--", label=r"$z_\mathrm{a}$ (NN $\alpha = \num{0.01}$)")
+    plt.plot(t_eval, y[1], "--", label=r"$z_\mathrm{s}$ (NN $\alpha = \num{0.01}$)")
 
     print("Max diff z_a: ", np.max(np.abs(y_ref[0] - y[0])))
     print("Max diff z_s: ", np.max(np.abs(y_ref[1] - y[1])))
@@ -313,14 +313,14 @@ def plot_sol_ref_predicted():
 
     t_eval, y, _, _ = sol()
 
-    plt.plot(t_eval, y[0], "--", label=r"$z_a$ (NN $\alpha=0.1$)")
-    plt.plot(t_eval, y[1], "--", label=r"$z_s$ (NN $\alpha=0.1$)")
+    plt.plot(t_eval, y[0], "--", label=r"$z_\mathrm{a}$ (NN $\alpha = \num{0.1}$)")
+    plt.plot(t_eval, y[1], "--", label=r"$z_\mathrm{s}$ (NN $\alpha = \num{0.1}$)")
 
     print("Max diff z_a: ", np.max(np.abs(y_ref[0] - y[0])))
     print("Max diff z_s: ", np.max(np.abs(y_ref[1] - y[1])))
 
-    plt.xlabel("Time $t$ [s]")
-    plt.ylabel("Amplitude $z$ [m]")
+    plt.xlabel(r"Zeit $t$ [\unit{s}]")
+    plt.ylabel(r"Auslenkung $z$ [\unit{m}]")
     plt.legend()
 
 
@@ -418,8 +418,8 @@ def plot_runtime_rk45():
     print(error_predict, times_predict)
     print(error_spline, times_spline)
     print(tol_space)
-    plt.loglog(error_predict, times_predict, label="NN")
-    plt.loglog(error_spline, times_spline, label="NN (spline)")
+    plt.loglog(error_predict, times_predict, label="direkter Aufruf")
+    plt.loglog(error_spline, times_spline, label="indirekter Aufruf")
     plt.xlabel(r"Error")
     plt.ylabel(r"Zeit $t$ [\unit{s}]")
     plt.legend()
@@ -483,9 +483,9 @@ def plot_data_fft():
     y_15 = filter_data(data_l, 15, d=x_vals[1] - x_vals[0])
 
     plt.plot(x_vals, data_l, "x", label="Messdaten", alpha=0.5)
-    plt.plot(x_vals, y_15, label="15Hz")
-    plt.plot(x_vals, y_10, label="10Hz")
-    plt.plot(x_vals, y_5, label="5Hz")
+    plt.plot(x_vals, y_15, label=r"\qty{15}{\hertz}")
+    plt.plot(x_vals, y_10, label=r"\qty{10}{\hertz}")
+    plt.plot(x_vals, y_5, label=r"\qty{5}{\hertz}")
 
     plt.xlabel(r"Zeit $t$ [\unit{s}]")
     plt.ylabel(r"Auslenkung [\unit{m}]")
@@ -503,8 +503,8 @@ def plot_prediction():
     plt.plot(x_vals, data_l, "x", label="Messdaten", alpha=0.5)
     plt.plot(x_vals, model.predict(x_vals), label="Vorhersage")
 
-    plt.xlabel(r"Time $t$ [\unit{s}]")
-    plt.ylabel(r"Amplitude [\unit{m}]")
+    plt.xlabel(r"Zeit $t$ [\unit{s}]")
+    plt.ylabel(r"Auslenkung [\unit{m}]")
     plt.legend()
 
 
@@ -521,16 +521,16 @@ def plot_model_prediction_alpha():
 
     config.second_diff_weight = 0
     config.first_diff_weight = 0
-    plt.plot(nn_x, load_model().predict(nn_x), label=fr'$\alpha={config.first_diff_weight}$')
+    plt.plot(nn_x, load_model().predict(nn_x), label=r'$\alpha=0$')
 
     config.first_diff_weight = 0.01
-    plt.plot(nn_x, load_model().predict(nn_x), label=fr'$\alpha={config.first_diff_weight}$')
+    plt.plot(nn_x, load_model().predict(nn_x), label=r'$\alpha=\num{0.01}$')
 
     config.first_diff_weight = 0.1
-    plt.plot(nn_x, load_model().predict(nn_x), label=fr'$\alpha={config.first_diff_weight}$')
+    plt.plot(nn_x, load_model().predict(nn_x), label=r'$\alpha=\num{0.1}$')
 
     config.first_diff_weight = 0.25
-    plt.plot(nn_x, load_model().predict(nn_x), label=fr'$\alpha={config.first_diff_weight}$')
+    plt.plot(nn_x, load_model().predict(nn_x), label=r'$\alpha=\num{0.25}$')
 
     plt.plot(x_vals, data, "x", label="Messdaten", alpha=0.5)
 
@@ -551,13 +551,13 @@ def plot_model_prediction_alpha_simulated():
 
     config.second_diff_weight = 0
     config.first_diff_weight = 0
-    plt.plot(nn_x, load_model().predict(nn_x), label=fr'$\alpha={config.first_diff_weight}$')
+    plt.plot(nn_x, load_model().predict(nn_x), label=r'$\alpha=\num{0}$')
 
     config.first_diff_weight = 0.01
-    plt.plot(nn_x, load_model().predict(nn_x), label=fr'$\alpha={config.first_diff_weight}$')
+    plt.plot(nn_x, load_model().predict(nn_x), label=r'$\alpha=\num{0.01}$')
 
     config.first_diff_weight = 0.1
-    plt.plot(nn_x, load_model().predict(nn_x), label=fr'$\alpha={config.first_diff_weight}$')
+    plt.plot(nn_x, load_model().predict(nn_x), label=r'$\alpha=\num{0.1}$')
 
     plt.plot(x_vals[9::10], data[9::10], "--", label="Messdaten")
 
@@ -581,19 +581,19 @@ def plot_model_prediction_beta():
     config.first_diff_weight = 0
     config.second_diff_weight = 0
     train_nn()
-    plt.plot(nn_x, load_model().predict(nn_x), label=fr'$\beta={config.first_diff_weight}$')
+    plt.plot(nn_x, load_model().predict(nn_x), label=r'$\beta=\num{0}$')
 
     config.second_diff_weight = 0.01
     train_nn()
-    plt.plot(nn_x, load_model().predict(nn_x), label=fr'$\beta={config.first_diff_weight}$')
+    plt.plot(nn_x, load_model().predict(nn_x), label=r'$\beta=\num{0.01}$')
 
     config.second_diff_weight = 0.1
     train_nn()
-    plt.plot(nn_x, load_model().predict(nn_x), label=fr'$\beta={config.first_diff_weight}$')
+    plt.plot(nn_x, load_model().predict(nn_x), label=r'$\beta=\num{0.1}$')
 
     config.second_diff_weight = 0.25
     train_nn()
-    plt.plot(nn_x, load_model().predict(nn_x), label=fr'$\beta={config.first_diff_weight}$')
+    plt.plot(nn_x, load_model().predict(nn_x), label=r'$\beta=\num{0.25}$')
 
     plt.plot(x_vals, data, "x", label="Messdaten", alpha=0.5)
 
@@ -681,9 +681,9 @@ def plot_sol_err_spline():
 
 
     plt.loglog(h_space, error_0, label=r"$\alpha = 0$")
-    plt.loglog(h_space, error_1, label=r"$\alpha = 0.01$")
-    plt.loglog(h_space, error_2, label=r"$\alpha = 0.1$")
-    plt.loglog(h_space, error_3, label=r"$\alpha = 0.25$")
+    plt.loglog(h_space, error_1, label=r"$\alpha = \num{0.01}$")
+    plt.loglog(h_space, error_2, label=r"$\alpha = \num{0.1}$")
+    plt.loglog(h_space, error_3, label=r"$\alpha = \num{0.25}$")
 
     plt.xlabel(r"Schrittweite $h$")
     plt.ylabel(r"Error")
