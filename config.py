@@ -18,13 +18,17 @@ class Excitations(Enum):
 
 first_diff_weight = 0
 second_diff_weight = 0
+
+path_override = None
 def get_model_path():
+    if path_override:
+        return path_override
     return "keras-models/" + str(first_diff_weight) + "_" + str(second_diff_weight) + "_" + data_source.value + ".model.keras"
 
 excitation = Excitations.SIMULATED_NEURAL_NETWORK
-data_source = TrainData.SIMULATED
+data_source = TrainData.DATA
 
-t_end = 3
+t_end = 10
 delta_t = 0.025
 delta_t_simulation = delta_t / 10
 

@@ -690,8 +690,32 @@ def plot_sol_err_spline():
     plt.legend()
 
 
+def plot_topologie_comparison():
+    nn_x = np.arange(0, config.t_end, config.delta_t_simulation / 10)
+    data, _, x_vals = read_data()
+    x_vals = x_vals[x_vals < config.t_end]
+    data = data[:len(x_vals)]
+
+    plt.figure(figsize=set_size())
+
+    config.path_override = "keras-models/one-layer.model.keras"
+    plt.plot(nn_x, load_model().predict(nn_x), label=r'Eine verstecke Schicht')
+
+    config.path_override = "keras-models/two-layers.model.keras"
+    plt.plot(nn_x, load_model().predict(nn_x), label=r'Zwei verstecke Schichten')
+
+    config.path_override = "keras-models/normal.model.keras"
+    plt.plot(nn_x, load_model().predict(nn_x), label=r'Normal')
+
+    plt.plot(x_vals, data, "x", label="Messdaten", alpha=0.5)
+
+    plt.xlabel(r'Zeit $t$ [\unit{s}]')
+    plt.ylabel(r'Auslenkung [\unit{m}]')
+    plt.legend()
+
+
 if __name__ == '__main__':
-    plot_sol_err_spline()
+    plot_topologie_comparison()
 
     plt.tight_layout(pad=0.3)
-    plt.savefig('plot/plot_sol_err_spline.pgf', format='pgf')
+    plt.savefig('plot/plot_topologie_comparison.pgf', format='pgf')

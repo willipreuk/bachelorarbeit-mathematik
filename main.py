@@ -18,5 +18,4 @@ def train_alpha():
 
 
 if __name__ == '__main__':
-    config.data_source = config.TrainData.SIMULATED
-    train_alpha()
+    train_nn()
