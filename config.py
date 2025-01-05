@@ -15,15 +15,18 @@ class Excitations(Enum):
     SIMULATED_NEURAL_NETWORK_PREDICT = "simulated neural network excitations prediction"
 
 
-
 first_diff_weight = 0
 second_diff_weight = 0
 
 path_override = None
+
+
 def get_model_path():
     if path_override:
         return path_override
-    return "keras-models/" + str(first_diff_weight) + "_" + str(second_diff_weight) + "_" + data_source.value + ".model.keras"
+    return "keras-models/" + str(first_diff_weight) + "_" + str(
+        second_diff_weight) + "_" + data_source.value + ".model.keras"
+
 
 excitation = Excitations.SIMULATED_NEURAL_NETWORK
 data_source = TrainData.DATA

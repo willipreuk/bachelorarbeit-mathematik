@@ -672,13 +672,11 @@ def plot_sol_err_spline():
         error_2.append(np.mean(np.abs(ref_sol(t_eval) - solution_2.y)))
         error_3.append(np.mean(np.abs(ref_sol(t_eval) - solution_3.y)))
 
-
     print(h_space)
     print(error_0)
     print(error_1)
     print(error_2)
     print(error_3)
-
 
     plt.loglog(h_space, error_0, label=r"$\alpha = 0$")
     plt.loglog(h_space, error_1, label=r"$\alpha = \num{0.01}$")

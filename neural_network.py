@@ -39,6 +39,12 @@ def load_model():
         model = Sequential([
             Input(shape=(1,)),
             feature_normalizer,
+            layers.Dense(128),
+            layers.LeakyReLU(),
+            layers.Dense(256),
+            layers.LeakyReLU(),
+            layers.Dense(512),
+            layers.LeakyReLU(),
             layers.Dense(512),
             layers.LeakyReLU(),
             layers.Dense(1, activation='linear'),

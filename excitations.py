@@ -7,9 +7,10 @@ from neural_network import predict
 from data import read_data, simulated_excitation, simulated_diff_excitation
 from neural_network import load_model
 
+
 def _filter_data(data, cutoff_freq, sample_rate):
     fft_result = np.fft.fft(data)
-    fft_freq = np.fft.fftfreq(len(data), d=1/sample_rate)
+    fft_freq = np.fft.fftfreq(len(data), d=1 / sample_rate)
 
     fft_result[np.abs(fft_freq) > cutoff_freq] = 0
 
@@ -51,7 +52,8 @@ def time_excitations(t):
             last_second_dif_wight = config.second_diff_weight
             last_neural_network_predict_delta_t = config.neural_network_predict_delta_t
 
-        return _nn_spline(t), _nn_spline(t + config.phase_shift), _nn_spline(t, 1), _nn_spline(t + config.phase_shift, 1)
+        return _nn_spline(t), _nn_spline(t + config.phase_shift), _nn_spline(t, 1), _nn_spline(t + config.phase_shift,
+                                                                                               1)
 
     if config.excitation == config.Excitations.SIMULATED:
         left, right = simulated_excitation(t)
@@ -62,11 +64,10 @@ def time_excitations(t):
 
     if config.excitation == config.Excitations.SIMULATED_NEURAL_NETWORK_PREDICT or config.excitation == config.Excitations.DATA_NEURAL_NETWORK_PREDICT:
         if (model is None) or (config.first_diff_weight, config.second_diff_weight) != (
-        last_first_dif_weight, last_second_dif_wight):
+                last_first_dif_weight, last_second_dif_wight):
             model = load_model()
             last_first_dif_weight = config.first_diff_weight
             last_second_dif_wight = config.second_diff_weight
-
 
         print("t: ", t)
 
